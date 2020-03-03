@@ -1,0 +1,36 @@
+import State from "./states/State";
+import SingleplayerState from "./states/SingleplayerState";
+
+export const Screen = {
+  width: 1080,
+  height: 720,
+};
+
+class Game {
+  private g: CanvasRenderingContext2D;
+  private currentState: State;
+
+  constructor(g: CanvasRenderingContext2D) {
+    this.g = g;
+    this.currentState = SingleplayerState.getInstance();
+  }
+
+  public update(delta: number): void {
+    this.currentState.update(delta);
+  }
+
+  public render(): void {
+    const {g} = this;
+    const {width, height} = Screen;
+
+    // clear screen
+    g.clearRect(0, 0, width, height);
+    g.fillStyle = 'black';
+    g.fillRect(0, 0, width, height);
+
+    // render state
+    this.currentState.render(g);
+  }
+}
+
+export default Game;
