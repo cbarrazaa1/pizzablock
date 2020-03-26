@@ -273,7 +273,7 @@ class Block {
     let simRotation = this.rotation;
     simRotation--;
     if (simRotation < 0) {
-      this.rotation = this.shape.rotations.length - 1;
+      simRotation = this.shape.rotations.length - 1;
     }
 
     return {

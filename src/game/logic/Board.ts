@@ -55,6 +55,10 @@ class Board {
       if (shouldFall) {
         for (let i = 0; i < shapeWidth; i++) {
           for (let j = 0; j < shapeHeight; j++) {
+            if (y + j + 1 > BOARD_HEIGHT) {
+              continue;
+            }
+
             if (
               shape.rotations[rotation][j][i] === 1 &&
               this.mat[x + i][y + j + 1].value === 1
@@ -92,23 +96,24 @@ class Board {
   public input(e: InputEvent): void {
     // movement
     if (InputHandler.isKeyDown(InputKey.LEFT, e)) {
-      if (this.selectedBlock.x - 1 >= 0) {
+      if (this.canMove(true)) {
         this.selectedBlock.x--;
       }
     } else if (InputHandler.isKeyDown(InputKey.RIGHT, e)) {
-      const {shape, rotation} = this.selectedBlock;
-      const shapeWidth = shape.rotations[rotation][0].length;
-
-      if (this.selectedBlock.x + shapeWidth + 1 <= BOARD_WIDTH) {
+      if (this.canMove(false)) {
         this.selectedBlock.x++;
       }
     }
 
     // rotation
     if (InputHandler.isKeyDown(InputKey.Z, e)) {
-      this.selectedBlock.rotateCW();
+      if (this.canRotate(true)) {
+        this.selectedBlock.rotateCW();
+      }
     } else if (InputHandler.isKeyDown(InputKey.X, e)) {
-      this.selectedBlock.rotateCCW();
+      if (this.canRotate(false)) {
+        this.selectedBlock.rotateCCW();
+      }
     }
   }
 
@@ -148,6 +153,73 @@ class Board {
         }
       }
     }
+  }
+
+  private canMove(left: boolean): boolean {
+    const {shape, rotation} = this.selectedBlock;
+    const shapeWidth = shape.rotations[rotation][0].length;
+    const shapeHeight = shape.rotations[rotation].length;
+    const {x, y} = this.selectedBlock;
+
+    // check if we move outside of board
+    if (left) {
+      if (x - 1 < 0) {
+        return false;
+      }
+    } else {
+      if (x + shapeWidth + 1 > BOARD_WIDTH) {
+        return false;
+      }
+    }
+
+    // check if we move into a filled block
+    for (let i = 0; i < shapeWidth; i++) {
+      for (let j = 0; j < shapeHeight; j++) {
+        if (shape.rotations[rotation][j][i] === 1) {
+          if (left) {
+            if (this.mat[x + i - 1][y + j].value === 1) {
+              return false;
+            }
+          } else {
+            if (this.mat[x + i + 1][y + j].value === 1) {
+              return false;
+            }
+          }
+        }
+      }
+    }
+
+    return true;
+  }
+
+  private canRotate(cw: boolean): boolean {
+    let sim = this.selectedBlock.simulateRotateCW();
+    if (!cw) {
+      sim = this.selectedBlock.simulateRotateCCW();
+    }
+
+    const {position, rotation} = sim;
+    const {newX, newY} = position;
+    const shapeHeight = rotation.length;
+    const shapeWidth = rotation[0].length;
+
+    // check if we rotate outside of the board
+    if (newX < 0 || newX + shapeWidth > BOARD_WIDTH || newY + shapeHeight > BOARD_HEIGHT || newY < 0) {
+      return false;
+    }
+
+    // check if we rotate into a filled block
+    for (let i = 0; i < shapeWidth; i++) {
+      for (let j = 0; j < shapeHeight; j++) {
+        if (rotation[j][i] === 1) {
+          if (this.mat[newX + i][newY + j].value === 1) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
   }
 }
 
