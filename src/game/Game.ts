@@ -1,4 +1,5 @@
-import State, {InputEvent} from './states/State';
+import State from './states/State';
+import {InputEvent} from './InputHandler';
 import SingleplayerState from './states/SingleplayerState';
 
 export const Screen = {

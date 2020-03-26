@@ -1,4 +1,5 @@
-import State, {InputEvent} from './State';
+import State from './State';
+import {InputEvent} from '../InputHandler';
 import {Nullable} from '../../util/Types';
 import Board from '../logic/Board';
 

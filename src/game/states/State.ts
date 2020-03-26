@@ -1,4 +1,4 @@
-export type InputEvent = React.KeyboardEvent | React.MouseEvent;
+import {InputEvent} from '../InputHandler';
 
 abstract class State {
   public update(delta: number): void {}

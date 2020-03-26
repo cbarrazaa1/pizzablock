@@ -1,6 +1,6 @@
 import Color from '../Color';
 import Block, {BlockType} from './Block';
-import {InputEvent} from '../states/State';
+import InputHandler, {InputEvent, InputKey} from '../InputHandler';
 
 interface BlockData {
   value: number;
@@ -35,7 +35,6 @@ class Board {
       const {x, y, rotation, shape, color} = this.selectedBlock;
       const shapeHeight = shape.rotations[rotation].length;
       const shapeWidth = shape.rotations[rotation][0].length;
-      console.log(shapeWidth, shapeHeight);
 
       // check if at bottom
       if (y + shapeHeight + 1 > BOARD_HEIGHT) {
@@ -91,17 +90,18 @@ class Board {
   }
 
   public input(e: InputEvent): void {
-    if (e.type === 'keydown') {
-      const ev = e as React.KeyboardEvent;
-      if (ev.key === 'ArrowLeft') {
-        this.selectedBlock.x--;
-      } else if (ev.key === 'ArrowRight') {
-        this.selectedBlock.x++;
-      } else if (ev.key === 'z') {
-        this.selectedBlock.rotateCCW();
-      } else if (ev.key === 'x') {
-        this.selectedBlock.rotateCW();
-      }
+    // movement
+    if (InputHandler.isKeyDown(InputKey.LEFT, e)) {
+      this.selectedBlock.x--;
+    } else if (InputHandler.isKeyDown(InputKey.RIGHT, e)) {
+      this.selectedBlock.x++;
+    }
+
+    // rotation
+    if (InputHandler.isKeyDown(InputKey.Z, e)) {
+      this.selectedBlock.rotateCW();
+    } else if (InputHandler.isKeyDown(InputKey.X, e)) {
+      this.selectedBlock.rotateCCW();
     }
   }
 
