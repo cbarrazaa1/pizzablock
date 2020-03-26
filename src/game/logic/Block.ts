@@ -14,6 +14,15 @@ export type BlockShape = {
   rotations: number[][][];
 };
 
+export type RotationSimulationResult = {
+  rotation: number[][];
+  position: {
+    newX: number,
+    newY: number,
+  };
+}
+
+
 function mapBlockTypeToShape(type: BlockType): BlockShape {
   let res = {
     rotations: [[[0]]],
@@ -134,6 +143,7 @@ class Block {
   public x: number;
   public y: number;
   public shape: BlockShape;
+  private type: BlockType;
 
   constructor(type: BlockType, x: number, y: number) {
     this.color = Color.RED;
@@ -141,40 +151,110 @@ class Block {
     this.rotation = 0;
     this.x = x;
     this.y = y;
+    this.type = type;
   }
 
   rotateCW(): void {
+    const oldRot = this.rotation;
     this.rotation++;
     if (this.rotation === this.shape.rotations.length) {
       this.rotation = 0;
     }
+
+    const newPos = this.applyRotationOffset(oldRot, this.rotation);
+    this.x = newPos.newX;
+    this.y = newPos.newY;
   }
 
   rotateCCW(): void {
+    const oldRot = this.rotation;
     this.rotation--;
     if (this.rotation < 0) {
       this.rotation = this.shape.rotations.length - 1;
     }
+
+    const newPos = this.applyRotationOffset(oldRot, this.rotation);
+    this.x = newPos.newX;
+    this.y = newPos.newY;
   }
 
-  simulateRotateCW(): number[][] {
+  applyRotationOffset(oldRot: number, newRot: number): {newX: number, newY: number} {
+    const {x, y} = this;
+    let newX = x, newY = y;
+
+    switch (this.type) {
+      case BlockType.I:
+        if (oldRot === 0 && newRot === 1) {
+          newX = x + 2;
+          newY = y - 2;
+        } else if (oldRot === 1 && newRot === 0) {
+          newX = x - 2;
+          newY = y + 2;
+        }
+        break;
+      case BlockType.T:
+      case BlockType.L:
+      case BlockType.J:
+        if (oldRot === 0 && newRot === 1) {
+          newY = y - 1;
+        } else if (oldRot === 2 && newRot === 3) {
+          newX = x + 1;
+        } else if (oldRot === 3 && newRot === 0) {
+          newX = x - 1;
+          newY = y + 1;
+        } else if (oldRot === 1 && newRot === 0) {
+          newY = y + 1;
+        } else if (oldRot === 3 && newRot === 2) {
+          newX = x - 1;
+        } else if (oldRot === 0 && newRot === 3) {
+          newX = x + 1;
+          newY = y - 1;
+        }
+        break;
+      case BlockType.S:
+      case BlockType.Z:
+        if (oldRot === 0 && newRot === 1) {
+          newX = x + 1;
+          newY = y - 1;
+        } else if (oldRot === 1 && newRot === 0) {
+          newX = x - 1;
+          newY = y + 1;
+        }
+        break;
+    
+      default:
+        break;
+    }
+
+    return {newX, newY}
+  }
+
+  simulateRotateCW(): RotationSimulationResult {
+    const oldSimRot = this.rotation;
     let simRotation = this.rotation;
     simRotation++;
     if (simRotation === this.shape.rotations.length) {
       simRotation = 0;
     }
 
-    return [...this.shape.rotations[simRotation]];
+    return {
+      rotation: [...this.shape.rotations[simRotation]],
+      position: this.applyRotationOffset(oldSimRot, simRotation),
+    };
   }
 
-  simulateRotateCCW(): number[][] {
+  simulateRotateCCW(): RotationSimulationResult {
+    const oldSimRot = this.rotation;
     let simRotation = this.rotation;
     simRotation--;
     if (simRotation < 0) {
       this.rotation = this.shape.rotations.length - 1;
     }
 
-    return [...this.shape.rotations[simRotation]];
+    return {
+      rotation: [...this.shape.rotations[simRotation]],
+      position: this.applyRotationOffset(oldSimRot, simRotation),
+    };
   }
 }
 
