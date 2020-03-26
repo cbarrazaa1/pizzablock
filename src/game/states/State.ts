@@ -1,12 +1,9 @@
-class State {
-  constructor() {
-    if (new.target === State) {
-      console.error('State is an abstract class.');
-    }
-  }
+export type InputEvent =  React.KeyboardEvent | React.MouseEvent;
 
+abstract class State {
   public update(delta: number): void {}
   public render(g: CanvasRenderingContext2D): void {}
+  public input(e: InputEvent): void {}
 }
 
 export default State;

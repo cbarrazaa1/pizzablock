@@ -1,4 +1,4 @@
-import State from "./State";
+import State, {InputEvent} from "./State";
 import {Nullable} from '../../util/Types';
 import Board from "../logic/Board";
 
@@ -25,6 +25,10 @@ class SingleplayerState extends State {
 
   public render(g: CanvasRenderingContext2D): void {
     this.board.render(g);
+  }
+
+  public input(e: InputEvent): void {
+    this.board.input(e);
   }
 }
 

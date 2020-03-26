@@ -1,4 +1,4 @@
-import State from "./states/State";
+import State, { InputEvent } from "./states/State";
 import SingleplayerState from "./states/SingleplayerState";
 
 export const Screen = {
@@ -17,6 +17,10 @@ class Game {
 
   public update(delta: number): void {
     this.currentState.update(delta);
+  }
+
+  public input(e: InputEvent): void {
+    this.currentState.input(e);
   }
 
   public render(): void {
