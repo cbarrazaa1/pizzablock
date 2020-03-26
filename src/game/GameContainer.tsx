@@ -7,12 +7,7 @@ function GameContainer(): JSX.Element {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [game, setGame] = useState<Nullable<Game>>(null);
 
-  const inputCallback = useCallback(
-    e => {
-      game?.input(e);
-    },
-    [game],
-  );
+  const inputCallback = useCallback(e => game?.input(e), [game]);
 
   useEffect(() => {
     setGame(new Game(canvas.current!.getContext('2d')!));
