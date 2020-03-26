@@ -1,5 +1,5 @@
 import Color from '../Color';
-import Block, {BlockType} from './Block';
+import Block from './Block';
 import InputHandler, {InputEvent, InputKey} from '../InputHandler';
 
 interface BlockData {
@@ -94,7 +94,7 @@ class Board {
       this.dropTimer = 0;
     }
     this.dropTimer += delta;
-  
+
     // timer to spawn new block
     if (this.shouldSpawnBlock) {
       if (this.newBlockTimer >= 260) {
@@ -217,7 +217,12 @@ class Board {
     const shapeWidth = rotation[0].length;
 
     // check if we rotate outside of the board
-    if (newX < 0 || newX + shapeWidth > BOARD_WIDTH || newY + shapeHeight > BOARD_HEIGHT || newY < 0) {
+    if (
+      newX < 0 ||
+      newX + shapeWidth > BOARD_WIDTH ||
+      newY + shapeHeight > BOARD_HEIGHT ||
+      newY < 0
+    ) {
       return false;
     }
 

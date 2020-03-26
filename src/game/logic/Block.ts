@@ -1,5 +1,5 @@
 import Color from '../Color';
-import { randInt } from '../../util/Rand';
+import {randInt} from '../../util/Rand';
 
 export enum BlockType {
   I = 0,
@@ -18,10 +18,10 @@ export type BlockShape = {
 export type RotationSimulationResult = {
   rotation: number[][];
   position: {
-    newX: number,
-    newY: number,
+    newX: number;
+    newY: number;
   };
-}
+};
 
 function mapBlockTypeToColor(type: BlockType): Color {
   switch (type) {
@@ -168,7 +168,7 @@ class Block {
     this.rotation = 0;
     this.x = x;
     this.y = y;
-    
+
     if (randomize) {
       this.type = randInt(0, 6) as BlockType;
     } else {
@@ -203,9 +203,13 @@ class Block {
     this.y = newPos.newY;
   }
 
-  applyRotationOffset(oldRot: number, newRot: number): {newX: number, newY: number} {
+  applyRotationOffset(
+    oldRot: number,
+    newRot: number,
+  ): {newX: number; newY: number} {
     const {x, y} = this;
-    let newX = x, newY = y;
+    let newX = x,
+      newY = y;
 
     switch (this.type) {
       case BlockType.I:
@@ -246,12 +250,12 @@ class Block {
           newY = y + 1;
         }
         break;
-    
+
       default:
         break;
     }
 
-    return {newX, newY}
+    return {newX, newY};
   }
 
   simulateRotateCW(): RotationSimulationResult {

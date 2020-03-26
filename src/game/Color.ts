@@ -1,4 +1,4 @@
-import { Nullable } from "../util/Types";
+import {Nullable} from '../util/Types';
 
 class Color {
   public static BLACK = new Color(0, 0, 0, 255);

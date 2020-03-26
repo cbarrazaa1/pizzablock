@@ -7,13 +7,13 @@ export enum InputKey {
   RIGHT = 'ArrowRight',
   Z = 'z',
   X = 'x',
-};
+}
 
 export enum InputButton {
   LEFT = 1,
   RIGHT = 2,
   MIDDLE = 4,
-};
+}
 
 interface InputHandler {
   readonly isKeyDown: (key: InputKey, e: InputEvent) => boolean;
@@ -36,7 +36,7 @@ const inputHandler: InputHandler = {
     }
 
     return false;
-  }
+  },
 };
 
 export default inputHandler;
