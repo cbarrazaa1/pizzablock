@@ -14,6 +14,8 @@ class Board {
   private mat: BlockData[][];
   private selectedBlock: Block;
   private dropTimer: number;
+  private newBlockTimer: number;
+  private shouldSpawnBlock: boolean;
 
   constructor() {
     const emptyData: BlockData = {
@@ -27,10 +29,12 @@ class Board {
 
     this.selectedBlock = new Block(4, 0);
     this.dropTimer = 0;
+    this.newBlockTimer = 0;
+    this.shouldSpawnBlock = false;
   }
 
   public update(delta: number): void {
-    if (this.dropTimer >= 200) {
+    if (this.dropTimer >= 100) {
       let shouldFall = true;
       const {x, y, rotation, shape, color} = this.selectedBlock;
       const shapeHeight = shape.rotations[rotation].length;
@@ -84,13 +88,22 @@ class Board {
       if (shouldFall) {
         this.selectedBlock.y++;
       } else {
-        this.selectedBlock = new Block(4, 0);
+        this.shouldSpawnBlock = true;
       }
 
       this.dropTimer = 0;
     }
-
     this.dropTimer += delta;
+  
+    // timer to spawn new block
+    if (this.shouldSpawnBlock) {
+      if (this.newBlockTimer >= 260) {
+        this.selectedBlock = new Block(4, 0);
+        this.newBlockTimer = 0;
+        this.shouldSpawnBlock = false;
+      }
+      this.newBlockTimer += delta;
+    }
   }
 
   public input(e: InputEvent): void {
