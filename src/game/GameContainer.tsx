@@ -1,15 +1,18 @@
 import * as React from 'react';
 import {useState, useCallback, useRef, useEffect} from 'react';
 import Game, {Screen} from './Game';
-import { Nullable } from '../util/Types';
+import {Nullable} from '../util/Types';
 
 function GameContainer(): JSX.Element {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [game, setGame] = useState<Nullable<Game>>(null);
 
-  const inputCallback = useCallback((e) => {
-    game?.input(e);
-  }, [game]);
+  const inputCallback = useCallback(
+    e => {
+      game?.input(e);
+    },
+    [game],
+  );
 
   useEffect(() => {
     setGame(new Game(canvas.current!.getContext('2d')!));
@@ -19,13 +22,13 @@ function GameContainer(): JSX.Element {
     if (game == null) {
       return;
     }
-    
+
     const timestep = 1 / 60.0;
     let delta = 0;
     let lastTick = new Date().getTime();
     let currentTick = 0;
     let animationFrameID = requestAnimationFrame(run);
-    
+
     function run(): void {
       currentTick = new Date().getTime();
       delta = currentTick - lastTick;
@@ -56,7 +59,7 @@ function GameContainer(): JSX.Element {
       onClick={inputCallback}
       onMouseMove={inputCallback}
     />
-  )
+  );
 }
 
 export default GameContainer;

@@ -1,4 +1,4 @@
-import Color from "../Color";
+import Color from '../Color';
 
 export enum BlockType {
   I,
@@ -7,12 +7,12 @@ export enum BlockType {
   L,
   J,
   S,
-  Z
-};
+  Z,
+}
 
 export type BlockShape = {
   rotations: number[][][];
-}
+};
 
 function mapBlockTypeToShape(type: BlockType): BlockShape {
   let res = {
@@ -21,78 +21,106 @@ function mapBlockTypeToShape(type: BlockType): BlockShape {
 
   switch (type) {
     case BlockType.I:
-      res.rotations = [
-         [[1, 1, 1, 1]],
-         [[1],
-          [1],
-          [1],
-          [1]]
-      ];
+      res.rotations = [[[1, 1, 1, 1]], [[1], [1], [1], [1]]];
       break;
     case BlockType.O:
       res.rotations = [
-        [[1, 1],
-         [1, 1]]
+        [
+          [1, 1],
+          [1, 1],
+        ],
       ];
       break;
     case BlockType.T:
       res.rotations = [
-        [[1, 1, 1],
-         [0, 1, 0]],
-        [[0, 1],
-         [1, 1],
-         [0, 1]],
-        [[0, 1, 0],
-         [1, 1, 1]],
-        [[1, 0],
-         [1, 1],
-         [1, 0]],
+        [
+          [1, 1, 1],
+          [0, 1, 0],
+        ],
+        [
+          [0, 1],
+          [1, 1],
+          [0, 1],
+        ],
+        [
+          [0, 1, 0],
+          [1, 1, 1],
+        ],
+        [
+          [1, 0],
+          [1, 1],
+          [1, 0],
+        ],
       ];
       break;
     case BlockType.L:
       res.rotations = [
-        [[1, 1, 1],
-         [1, 0, 0]],
-        [[1, 1],
-         [0, 1],
-         [0, 1]],
-        [[0, 0, 1],
-         [1, 1, 1]],
-        [[1, 0],
-         [1, 0],
-         [1, 1]]
+        [
+          [1, 1, 1],
+          [1, 0, 0],
+        ],
+        [
+          [1, 1],
+          [0, 1],
+          [0, 1],
+        ],
+        [
+          [0, 0, 1],
+          [1, 1, 1],
+        ],
+        [
+          [1, 0],
+          [1, 0],
+          [1, 1],
+        ],
       ];
       break;
     case BlockType.J:
       res.rotations = [
-        [[1, 1, 1],
-         [0, 0, 1]],
-        [[0, 1],
-         [0, 1],
-         [1, 1]],
-        [[1, 0, 0],
-         [1, 1, 1]],
-        [[1, 1],
-         [1, 0],
-         [1, 0]]
+        [
+          [1, 1, 1],
+          [0, 0, 1],
+        ],
+        [
+          [0, 1],
+          [0, 1],
+          [1, 1],
+        ],
+        [
+          [1, 0, 0],
+          [1, 1, 1],
+        ],
+        [
+          [1, 1],
+          [1, 0],
+          [1, 0],
+        ],
       ];
       break;
     case BlockType.S:
       res.rotations = [
-        [[1, 1, 0],
-         [0, 1, 1]],
-        [[0, 1],
-         [1, 1],
-         [1, 0]]
+        [
+          [1, 1, 0],
+          [0, 1, 1],
+        ],
+        [
+          [0, 1],
+          [1, 1],
+          [1, 0],
+        ],
       ];
       break;
     case BlockType.Z:
       res.rotations = [
-        [[0, 1, 1],
-         [1, 1, 0]],
-        [[1, 0],
-         [1, 1],
-         [0, 1]]
+        [
+          [0, 1, 1],
+          [1, 1, 0],
+        ],
+        [
+          [1, 0],
+          [1, 1],
+          [0, 1],
+        ],
       ];
       break;
   }

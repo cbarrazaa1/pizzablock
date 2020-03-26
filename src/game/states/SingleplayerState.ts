@@ -1,6 +1,6 @@
-import State, {InputEvent} from "./State";
+import State, {InputEvent} from './State';
 import {Nullable} from '../../util/Types';
-import Board from "../logic/Board";
+import Board from '../logic/Board';
 
 class SingleplayerState extends State {
   private static instance: Nullable<SingleplayerState> = null;

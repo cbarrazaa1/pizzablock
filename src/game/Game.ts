@@ -1,5 +1,5 @@
-import State, { InputEvent } from "./states/State";
-import SingleplayerState from "./states/SingleplayerState";
+import State, {InputEvent} from './states/State';
+import SingleplayerState from './states/SingleplayerState';
 
 export const Screen = {
   width: 1080,
