@@ -92,9 +92,16 @@ class Board {
   public input(e: InputEvent): void {
     // movement
     if (InputHandler.isKeyDown(InputKey.LEFT, e)) {
-      this.selectedBlock.x--;
+      if (this.selectedBlock.x - 1 >= 0) {
+        this.selectedBlock.x--;
+      }
     } else if (InputHandler.isKeyDown(InputKey.RIGHT, e)) {
-      this.selectedBlock.x++;
+      const {shape, rotation} = this.selectedBlock;
+      const shapeWidth = shape.rotations[rotation][0].length;
+
+      if (this.selectedBlock.x + shapeWidth + 1 <= BOARD_WIDTH) {
+        this.selectedBlock.x++;
+      }
     }
 
     // rotation
