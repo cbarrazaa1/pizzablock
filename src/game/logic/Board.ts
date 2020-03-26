@@ -25,12 +25,12 @@ class Board {
       .fill(null)
       .map(() => new Array(BOARD_HEIGHT).fill(emptyData));
 
-    this.selectedBlock = new Block(BlockType.S, 4, 0);
+    this.selectedBlock = new Block(4, 0);
     this.dropTimer = 0;
   }
 
   public update(delta: number): void {
-    if (this.dropTimer >= 1000) {
+    if (this.dropTimer >= 200) {
       let shouldFall = true;
       const {x, y, rotation, shape, color} = this.selectedBlock;
       const shapeHeight = shape.rotations[rotation].length;
@@ -80,7 +80,7 @@ class Board {
       if (shouldFall) {
         this.selectedBlock.y++;
       } else {
-        this.selectedBlock = new Block(BlockType.J, 4, 0);
+        this.selectedBlock = new Block(4, 0);
       }
 
       this.dropTimer = 0;

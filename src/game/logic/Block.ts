@@ -1,13 +1,14 @@
 import Color from '../Color';
+import { randInt } from '../../util/Rand';
 
 export enum BlockType {
-  I,
-  O,
-  T,
-  L,
-  J,
-  S,
-  Z,
+  I = 0,
+  O = 1,
+  T = 2,
+  L = 3,
+  J = 4,
+  S = 5,
+  Z = 6,
 }
 
 export type BlockShape = {
@@ -22,6 +23,24 @@ export type RotationSimulationResult = {
   };
 }
 
+function mapBlockTypeToColor(type: BlockType): Color {
+  switch (type) {
+    case BlockType.I:
+      return Color.CYAN;
+    case BlockType.O:
+      return Color.YELLOW;
+    case BlockType.T:
+      return Color.PURPLE;
+    case BlockType.L:
+      return Color.ORANGE;
+    case BlockType.J:
+      return Color.BLUE;
+    case BlockType.S:
+      return Color.RED;
+    case BlockType.Z:
+      return Color.GREEN;
+  }
+}
 
 function mapBlockTypeToShape(type: BlockType): BlockShape {
   let res = {
@@ -145,13 +164,19 @@ class Block {
   public shape: BlockShape;
   private type: BlockType;
 
-  constructor(type: BlockType, x: number, y: number) {
-    this.color = Color.RED;
-    this.shape = mapBlockTypeToShape(type);
+  constructor(x: number, y: number, randomize: boolean = true) {
     this.rotation = 0;
     this.x = x;
     this.y = y;
-    this.type = type;
+    
+    if (randomize) {
+      this.type = randInt(0, 6) as BlockType;
+    } else {
+      this.type = BlockType.I;
+    }
+
+    this.color = mapBlockTypeToColor(this.type);
+    this.shape = mapBlockTypeToShape(this.type);
   }
 
   rotateCW(): void {
