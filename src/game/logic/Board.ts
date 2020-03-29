@@ -11,10 +11,10 @@ interface BlockData {
   color: Color;
 }
 
-const BOARD_X = 10;
-const BOARD_Y = 10;
-const BOARD_WIDTH = 10;
-const BOARD_HEIGHT = 20;
+export const BOARD_X = 10;
+export const BOARD_Y = 10;
+export const BOARD_WIDTH = 10;
+export const BOARD_HEIGHT = 20;
 const DROP_TIMER_DEFAULT = 30;
 const NEW_BLOCK_TIMER_DEFAULT = 280;
 const MOVE_BLOCK_TIMER_DEFAULT = 110;
