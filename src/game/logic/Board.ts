@@ -205,6 +205,7 @@ class Board {
 
     // selected block movement
     if (this.timers.moveBlock.isActivated()) {
+      console.log('hi')
       if (this.movingLeft) {
         if (this.canMove(true)) {
           this.selectedBlock.x--;
@@ -228,7 +229,6 @@ class Board {
     if (InputHandler.isKeyDown(InputKey.LEFT, e)) {
       this.movingLeft = true;
       this.movingRight = false;
-      this.timers.moveBlock.reset();
 
       if (this.initialMove) {
         this.timers.moveBlock.setResetTime(0);
@@ -237,7 +237,6 @@ class Board {
     } else if (InputHandler.isKeyDown(InputKey.RIGHT, e)) {
       this.movingLeft = false;
       this.movingRight = true;
-      this.timers.moveBlock.reset();
 
       if (this.initialMove) {
         this.timers.moveBlock.setResetTime(0);
