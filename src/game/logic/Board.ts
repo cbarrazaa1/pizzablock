@@ -15,9 +15,51 @@ export const BOARD_X = 10;
 export const BOARD_Y = 10;
 export const BOARD_WIDTH = 10;
 export const BOARD_HEIGHT = 20;
-const DROP_TIMER_DEFAULT = 150;
 const NEW_BLOCK_TIMER_DEFAULT = 280;
-const MOVE_BLOCK_TIMER_DEFAULT = 110;
+const MOVE_BLOCK_TIMER_DEFAULT = 100;
+
+function mapLevelToDropTimer(level: number): number {
+  switch (level) {
+    case 0:
+      return 800;
+    case 1:
+      return 716;
+    case 2:
+      return 633;
+    case 3:
+      return 550;
+    case 4:
+      return 466;
+    case 5:
+      return 383;
+    case 6:
+      return 300;
+    case 7:
+      return 216;
+    case 8:
+      return 133;
+    case 9:
+      return 100;
+    case 10:
+    case 11:
+    case 12:
+      return 83;
+    case 13:
+    case 14:
+    case 15:
+      return 66;
+    case 16:
+    case 17:
+    case 18:
+      return 50;
+  }
+
+  if (level >= 19 && level <= 28) {
+    return 33;
+  }
+
+  return 16;
+}
 
 class Board {
   private mat: BlockData[][];
@@ -29,7 +71,9 @@ class Board {
   private movingRight: boolean;
   private clearingLines: boolean;
   private gameOver: boolean;
+  private lineCounter: number;
   public clearedLines: number;
+  public level: number;
 
   constructor() {
     const emptyData: BlockData = {
@@ -42,8 +86,9 @@ class Board {
       .map(() => new Array(BOARD_HEIGHT).fill(emptyData));
 
     this.selectedBlock = new Block(4, 0);
+    this.level = 9;
     this.timers = {
-      drop: new Timer(DROP_TIMER_DEFAULT),
+      drop: new Timer(mapLevelToDropTimer(this.level)),
       newBlock: new Timer(NEW_BLOCK_TIMER_DEFAULT),
       moveBlock: new Timer(MOVE_BLOCK_TIMER_DEFAULT),
     };
@@ -54,6 +99,7 @@ class Board {
     this.clearingLines = false;
     this.gameOver = false;
     this.clearedLines = 0;
+    this.lineCounter = 0;
   }
 
   private startGame(): void {
@@ -67,8 +113,9 @@ class Board {
       .map(() => new Array(BOARD_HEIGHT).fill(emptyData));
 
     this.selectedBlock = new Block(4, 0);
+    this.level = 9;
     this.timers = {
-      drop: new Timer(DROP_TIMER_DEFAULT),
+      drop: new Timer(mapLevelToDropTimer(this.level)),
       newBlock: new Timer(NEW_BLOCK_TIMER_DEFAULT),
       moveBlock: new Timer(MOVE_BLOCK_TIMER_DEFAULT),
     };
@@ -78,6 +125,8 @@ class Board {
     this.movingRight = false;
     this.clearingLines = false;
     this.gameOver = false;
+    this.clearedLines = 0;
+    this.lineCounter = 0;
   }
 
   public update(delta: number): void {
@@ -216,6 +265,14 @@ class Board {
                         self.clearingLines = false;
                         self.timers.newBlock.setResetTime(0);
                         self.clearedLines += linesY.length;
+                        self.lineCounter += linesY.length;
+
+                        // level up
+                        if (self.lineCounter >= 10) {
+                          self.level++;
+                          self.timers.drop.setResetTime(mapLevelToDropTimer(self.level));
+                          self.lineCounter = 0;
+                        }
                       }
                     })
                     .start();
