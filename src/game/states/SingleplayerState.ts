@@ -1,7 +1,12 @@
 import State from './State';
 import {InputEvent} from '../InputHandler';
 import {Nullable} from '../../util/Types';
-import Board, {BOARD_X, BOARD_Y, BOARD_WIDTH} from '../logic/Board';
+import Board, {
+  BOARD_X,
+  BOARD_Y,
+  BOARD_WIDTH,
+  BOARD_HEIGHT,
+} from '../logic/Board';
 import Container, {ContainerStyleProps} from '../ui/Container';
 import Color from '../Color';
 import Text from '../ui/Text';
@@ -21,6 +26,7 @@ class SingleplayerState extends State {
   private txtScore: Text;
   private cntNextBlock: Container;
   private nextBlock: CustomWidget;
+  private cntBoard: Container;
 
   constructor() {
     super();
@@ -53,7 +59,7 @@ class SingleplayerState extends State {
       .setStyle(cntStyle);
 
     this.nextBlock = new CustomWidget()
-      .onUpdate((self: CustomWidget, delta: number): void => {
+      .onUpdate((self: CustomWidget): void => {
         self.data['block'] = this.board.nextBlock;
       })
       .onRender((self: CustomWidget, g: CanvasRenderingContext2D): void => {
@@ -84,11 +90,31 @@ class SingleplayerState extends State {
       .addChildren('nextBlock', this.nextBlock)
       .setStyle(cntStyle);
 
+    this.cntBoard = new Container(
+      BOARD_X,
+      BOARD_Y,
+      BOARD_WIDTH * 32,
+      BOARD_HEIGHT * 32,
+    ).addChildren(
+      'board',
+      new CustomWidget()
+        .onUpdate((_, delta: number): void => {
+          this.board.update(delta);
+        })
+        .onInput((_, e: InputEvent): void => {
+          this.board.input(e);
+        })
+        .onRender((_, g: CanvasRenderingContext2D): void => {
+          this.board.render(g);
+        }),
+    );
+
     this.widgets = new WidgetManager()
       .addWidget('cntLines', this.cntLines)
       .addWidget('cntLevel', this.cntLevel)
       .addWidget('cntScore', this.cntScore)
-      .addWidget('cntNextBlock', this.cntNextBlock);
+      .addWidget('cntNextBlock', this.cntNextBlock)
+      .addWidget('cntBoard', this.cntBoard);
   }
 
   public static getInstance(): SingleplayerState {
@@ -100,7 +126,6 @@ class SingleplayerState extends State {
   }
 
   public update(delta: number): void {
-    this.board.update(delta);
     this.widgets.update(delta);
     this.txtLines.text = `Lines: ${this.board.clearedLines.toString()}`;
     this.txtLevel.text = `Level: ${this.board.level.toString()}`;
@@ -108,12 +133,10 @@ class SingleplayerState extends State {
   }
 
   public render(g: CanvasRenderingContext2D): void {
-    this.board.render(g);
     this.widgets.render(g);
   }
 
   public input(e: InputEvent): void {
-    this.board.input(e);
     this.widgets.input(e);
   }
 }
