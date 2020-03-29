@@ -1,6 +1,8 @@
 import Color from '../Color';
 import Block from './Block';
 import InputHandler, {InputEvent, InputKey} from '../InputHandler';
+import { StrMap } from '../../util/Types';
+import Timer from '../Timer';
 
 interface BlockData {
   value: number;
@@ -13,8 +15,7 @@ const BOARD_HEIGHT = 20;
 class Board {
   private mat: BlockData[][];
   private selectedBlock: Block;
-  private dropTimer: number;
-  private newBlockTimer: number;
+  private timers: StrMap<Timer>;
   private shouldSpawnBlock: boolean;
 
   constructor() {
@@ -28,13 +29,15 @@ class Board {
       .map(() => new Array(BOARD_HEIGHT).fill(emptyData));
 
     this.selectedBlock = new Block(4, 0);
-    this.dropTimer = 0;
-    this.newBlockTimer = 0;
+    this.timers = {
+      drop: new Timer(50),
+      newBlock: new Timer(260),
+    };
     this.shouldSpawnBlock = false;
   }
 
   public update(delta: number): void {
-    if (this.dropTimer >= 150) {
+    if (this.timers.drop.isActivated()) {
       if (!this.shouldSpawnBlock) {
         let shouldFall = true;
         const {x, y, rotation, shape, color} = this.selectedBlock;
@@ -135,7 +138,7 @@ class Board {
               }
             }
 
-            // shift blocks
+            // shift blocks down
             const shiftBlocks = (clearY: number, shiftCount: number): void => {
               for (let y = clearY - 1; y >= 0; y--) {
                 for (let x = 0; x < BOARD_WIDTH; x++) {
@@ -155,18 +158,16 @@ class Board {
 
         }
       }
-      this.dropTimer = 0;
     }
-    this.dropTimer += delta;
+    this.timers.drop.tick(delta);
 
     // timer to spawn new block
     if (this.shouldSpawnBlock) {
-      if (this.newBlockTimer >= 260) {
+      if (this.timers.newBlock.isActivated()) {
         this.selectedBlock = new Block(4, 0);
-        this.newBlockTimer = 0;
         this.shouldSpawnBlock = false;
       }
-      this.newBlockTimer += delta;
+      this.timers.newBlock.tick(delta);
     }
   }
 
