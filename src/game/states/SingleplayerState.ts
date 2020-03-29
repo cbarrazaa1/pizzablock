@@ -1,7 +1,12 @@
 import State from './State';
 import {InputEvent} from '../InputHandler';
 import {Nullable} from '../../util/Types';
-import Board, {BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT} from '../logic/Board';
+import Board, {
+  BOARD_X,
+  BOARD_Y,
+  BOARD_WIDTH,
+  BOARD_HEIGHT,
+} from '../logic/Board';
 import Container from '../ui/Container';
 import Color from '../Color';
 import Text from '../ui/Text';
@@ -11,11 +16,25 @@ class SingleplayerState extends State {
   private static instance: Nullable<SingleplayerState> = null;
   private board: Board;
   private widgets: WidgetManager;
+  private cntLines: Container;
+  private txtLines: Text;
 
   constructor() {
     super();
     this.board = new Board();
-    this.widgets = new WidgetManager();
+    const boardXWidth = BOARD_X + BOARD_WIDTH * 32;
+    
+    this.txtLines = new Text(0, 0, 'Lines: 0').centerHorizontally().centerVertically();
+    this.cntLines = new Container(
+      boardXWidth + 10,
+      BOARD_Y,
+      200,
+      60,
+    ).addChildren('lineCount', this.txtLines);
+
+    this.widgets = new WidgetManager()
+      .addWidget('cntLines', this.cntLines)
+      .addWidget('txtLines', this.txtLines);
   }
 
   public static getInstance(): SingleplayerState {
@@ -29,6 +48,7 @@ class SingleplayerState extends State {
   public update(delta: number): void {
     this.board.update(delta);
     this.widgets.update(delta);
+    this.txtLines.text = `Lines: ${this.board.clearedLines.toString()}`;
   }
 
   public render(g: CanvasRenderingContext2D): void {

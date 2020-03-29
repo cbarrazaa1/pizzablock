@@ -15,7 +15,7 @@ export const BOARD_X = 10;
 export const BOARD_Y = 10;
 export const BOARD_WIDTH = 10;
 export const BOARD_HEIGHT = 20;
-const DROP_TIMER_DEFAULT = 30;
+const DROP_TIMER_DEFAULT = 150;
 const NEW_BLOCK_TIMER_DEFAULT = 280;
 const MOVE_BLOCK_TIMER_DEFAULT = 110;
 
@@ -29,6 +29,7 @@ class Board {
   private movingRight: boolean;
   private clearingLines: boolean;
   private gameOver: boolean;
+  public clearedLines: number;
 
   constructor() {
     const emptyData: BlockData = {
@@ -52,6 +53,7 @@ class Board {
     this.movingRight = false;
     this.clearingLines = false;
     this.gameOver = false;
+    this.clearedLines = 0;
   }
 
   private startGame(): void {
@@ -213,6 +215,7 @@ class Board {
                         checkShiftBlocks();
                         self.clearingLines = false;
                         self.timers.newBlock.setResetTime(0);
+                        self.clearedLines += linesY.length;
                       }
                     })
                     .start();

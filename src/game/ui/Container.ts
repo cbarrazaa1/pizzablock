@@ -1,6 +1,6 @@
 import Widget, { StyleProps } from "./Widget";
 import Color from "../Color";
-import { StrMap } from "../../util/Types";
+import { StrMap, Nullable } from "../../util/Types";
 import {InputEvent} from '../InputHandler';
 
 export interface ContainerStyleProps extends StyleProps {
@@ -36,6 +36,10 @@ class Container extends Widget {
   public removeChildren(name: string): Container {
     delete this.children[name];
     return this;
+  }
+
+  public getChildren(name: string): Nullable<Widget> {
+    return this.children[name];
   }
 
   public setStyle(style: ContainerStyleProps): Container {
