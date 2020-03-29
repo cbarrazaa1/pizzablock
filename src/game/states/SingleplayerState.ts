@@ -41,21 +41,21 @@ class SingleplayerState extends State {
       .centerHorizontally()
       .centerVertically();
     this.cntLines = new Container(boardXWidth + 20, BOARD_Y + 1, 200, 60)
-      .addChildren('lineCount', this.txtLines)
+      .addChild('lineCount', this.txtLines)
       .setStyle(cntStyle);
 
     this.txtLevel = new Text(0, 0, 'Level: 0')
       .centerHorizontally()
       .centerVertically();
     this.cntLevel = new Container(boardXWidth + 20, BOARD_Y + 81, 200, 60)
-      .addChildren('lvlCount', this.txtLevel)
+      .addChild('lvlCount', this.txtLevel)
       .setStyle(cntStyle);
 
     this.txtScore = new Text(0, 0, 'Score: 0')
       .centerHorizontally()
       .centerVertically();
     this.cntScore = new Container(boardXWidth + 20, BOARD_Y + 161, 200, 60)
-      .addChildren('scoreCount', this.txtScore)
+      .addChild('scoreCount', this.txtScore)
       .setStyle(cntStyle);
 
     this.nextBlock = new CustomWidget()
@@ -87,7 +87,7 @@ class SingleplayerState extends State {
       });
 
     this.cntNextBlock = new Container(boardXWidth + 20, BOARD_Y + 241, 150, 150)
-      .addChildren('nextBlock', this.nextBlock)
+      .addChild('nextBlock', this.nextBlock)
       .setStyle(cntStyle);
 
     this.cntBoard = new Container(
@@ -95,7 +95,7 @@ class SingleplayerState extends State {
       BOARD_Y,
       BOARD_WIDTH * 32,
       BOARD_HEIGHT * 32,
-    ).addChildren(
+    ).addChild(
       'board',
       new CustomWidget()
         .onUpdate((_, delta: number): void => {

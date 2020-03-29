@@ -25,13 +25,13 @@ class Container extends Widget {
     this.style = getDefaultStyle();
   }
 
-  public addChildren(name: string, child: Widget): Container {
+  public addChild(name: string, child: Widget): Container {
     child.parent = this;
     this.children[name] = child;
     return this;
   }
 
-  public removeChildren(name: string): Container {
+  public removeChild(name: string): Container {
     delete this.children[name];
     return this;
   }
