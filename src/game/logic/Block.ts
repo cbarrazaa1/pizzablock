@@ -26,19 +26,19 @@ export type RotationSimulationResult = {
 function mapBlockTypeToColor(type: BlockType): Color {
   switch (type) {
     case BlockType.I:
-      return Color.CYAN;
+      return Color.CYAN.copy();
     case BlockType.O:
-      return Color.YELLOW;
+      return Color.YELLOW.copy();
     case BlockType.T:
-      return Color.PURPLE;
+      return Color.PURPLE.copy();
     case BlockType.L:
-      return Color.ORANGE;
+      return Color.ORANGE.copy();
     case BlockType.J:
-      return Color.BLUE;
+      return Color.BLUE.copy();
     case BlockType.S:
-      return Color.RED;
+      return Color.RED.copy();
     case BlockType.Z:
-      return Color.GREEN;
+      return Color.GREEN.copy();
   }
 }
 

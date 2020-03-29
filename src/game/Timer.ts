@@ -1,6 +1,6 @@
 class Timer {
   private accumulatedTime: number;
-  public resetTime: number;
+  private resetTime: number;
 
   constructor(resetTime: number) {
     this.accumulatedTime = 0;
@@ -22,6 +22,11 @@ class Timer {
 
   public reset(): void {
     this.accumulatedTime = 0;
+  }
+
+  public setResetTime(resetTime: number): void {
+    this.resetTime = resetTime;
+    this.reset();
   }
 }
 

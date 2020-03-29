@@ -4,6 +4,8 @@ import InputHandler, {InputEvent, InputKey} from '../InputHandler';
 import { StrMap } from '../../util/Types';
 import Timer from '../Timer';
 
+const TWEEN = require('@tweenjs/tween.js').default;
+
 interface BlockData {
   value: number;
   color: Color;
@@ -20,6 +22,7 @@ class Board {
   private initialMove: boolean;
   private movingLeft: boolean;
   private movingRight: boolean;
+  private clearingLines: boolean;
 
   constructor() {
     const emptyData: BlockData = {
@@ -33,14 +36,15 @@ class Board {
 
     this.selectedBlock = new Block(4, 0);
     this.timers = {
-      drop: new Timer(50),
-      newBlock: new Timer(260),
+      drop: new Timer(100),
+      newBlock: new Timer(280),
       moveBlock: new Timer(110),
     };
     this.shouldSpawnBlock = false;
     this.initialMove = false;
     this.movingLeft = false;
     this.movingRight = false;
+    this.clearingLines = false;
   }
 
   public update(delta: number): void {
@@ -59,7 +63,7 @@ class Board {
             for (let j = 0; j < shapeHeight; j++) {
               if (shape.rotations[rotation][j][i] === 1) {
                 this.mat[x + i][y + j] = {
-                  color,
+                  color: color.copy(),
                   value: 1,
                 };
               }
@@ -85,7 +89,7 @@ class Board {
                   for (let jj = 0; jj < shapeHeight; jj++) {
                     if (shape.rotations[rotation][jj][ii] === 1) {
                       this.mat[x + ii][y + jj] = {
-                        color,
+                        color: color.copy(),
                         value: 1,
                       };
                     }
@@ -110,69 +114,91 @@ class Board {
           this.shouldSpawnBlock = true;
 
           // check if any line was completed
-          const linesY = [];
-          const [startY, endY] = [y, y + shapeHeight - 1];
-          let completedLine = true;
-
-          for (let y = startY; y <= endY; y++) {
-            for (let x = 0; x < BOARD_WIDTH; x++) {
-              if (this.mat[x][y].value !== 1) {
-                completedLine = false;
-                break;
-              }
-            }
-
-            if (completedLine) {
-              linesY.push(y);
-
-              // delete line
-              for (let xx = 0; xx < BOARD_WIDTH; xx++) {
-                this.mat[xx][y].value = 0;
-              }
-            } else {
-              completedLine = true;
-            }
-          }
-
-          // shift blocks above cleared lines
-          if (linesY.length > 0) {
-            let sequentialClear = true;
-
-            // check if lines were cleared separately (can only happen with 2 line clears)
-            if (linesY.length === 2) {
-              if (linesY[1] - linesY[0] !== 1) {
-                sequentialClear = false;
-              }
-            }
-
-            // shift blocks down
-            const shiftBlocks = (clearY: number, shiftCount: number): void => {
-              for (let y = clearY - 1; y >= 0; y--) {
-                for (let x = 0; x < BOARD_WIDTH; x++) {
-                  this.mat[x][y + shiftCount] = {...this.mat[x][y]};
-                  this.mat[x][y].value = 0;
+          if (!this.clearingLines) {
+            const linesY: number[] = [];
+            const [startY, endY] = [y, y + shapeHeight - 1];
+            let completedLine = true;
+  
+            for (let y = startY; y <= endY; y++) {
+              for (let x = 0; x < BOARD_WIDTH; x++) {
+                if (this.mat[x][y].value !== 1) {
+                  completedLine = false;
+                  break;
                 }
               }
-            }
+  
+              const checkShiftBlocks = (): void => {
+                if (linesY.length > 0) {
+                  let sequentialClear = true;
+      
+                  // check if lines were cleared separately (can only happen with 2 line clears)
+                  if (linesY.length === 2) {
+                    if (linesY[1] - linesY[0] !== 1) {
+                      sequentialClear = false;
+                    }
+                  }
+      
+                  // shift blocks down
+                  const shiftBlocks = (clearY: number, shiftCount: number): void => {
+                    for (let y = clearY - 1; y >= 0; y--) {
+                      for (let x = 0; x < BOARD_WIDTH; x++) {
+                        this.mat[x][y + shiftCount] = {...this.mat[x][y]};
+                        this.mat[x][y].value = 0;
+                      }
+                    }
+                  }
+      
+                  if (sequentialClear) {
+                    shiftBlocks(linesY[0], linesY.length);
+                  } else {
+                    shiftBlocks(linesY[0], 1);
+                    shiftBlocks(linesY[1], 1);
+                  }
+                }
+              }
+  
+              if (completedLine) {
+                linesY.push(y);
+                this.clearingLines = true;
+                
+                // delete line
+                for (let xx = 0; xx < BOARD_WIDTH; xx++) {
+                  (function(xx, self) {
+                    new TWEEN.Tween({
+                      alpha: self.mat[xx][y].color.a,
+                    })
+                    .to({alpha: 0}, 200 + (xx * 40))
+                    .onUpdate((obj: any) => {
+                      self.mat[xx][y].color.a = obj.alpha;
+                    })
+                    .onComplete(() => {
+                      self.mat[xx][y].value = 0;
 
-            if (sequentialClear) {
-              shiftBlocks(linesY[0], linesY.length);
-            } else {
-              shiftBlocks(linesY[0], 1);
-              shiftBlocks(linesY[1], 1);
+                      if (xx === BOARD_WIDTH - 1 && y === linesY[linesY.length - 1]) {
+                        checkShiftBlocks();
+                        self.clearingLines = false;
+                        self.timers.newBlock.setResetTime(0);
+                      }
+                    })
+                    .start();
+                  })(xx, this)
+                }
+              } else {
+                completedLine = true;
+              }
             }
           }
-
         }
       }
     }
     this.timers.drop.tick(delta);
 
     // timer to spawn new block
-    if (this.shouldSpawnBlock) {
+    if (this.shouldSpawnBlock && !this.clearingLines) {
       if (this.timers.newBlock.isActivated()) {
         this.selectedBlock = new Block(4, 0);
         this.shouldSpawnBlock = false;
+        this.timers.newBlock.setResetTime(280);
       }
       this.timers.newBlock.tick(delta);
     }
@@ -188,8 +214,13 @@ class Board {
           this.selectedBlock.x++;
         }
       }
+
+      this.timers.moveBlock.setResetTime(110);
     }
     this.timers.moveBlock.tick(delta);
+
+    // update tween engine
+    TWEEN.update();
   }
 
   public input(e: InputEvent): void {
@@ -200,10 +231,8 @@ class Board {
       this.timers.moveBlock.reset();
 
       if (this.initialMove) {
-        if (this.canMove(true)) {
-          this.selectedBlock.x--;
-          this.initialMove = false;
-        }
+        this.timers.moveBlock.setResetTime(0);
+        this.initialMove = false;
       }
     } else if (InputHandler.isKeyDown(InputKey.RIGHT, e)) {
       this.movingLeft = false;
@@ -211,10 +240,8 @@ class Board {
       this.timers.moveBlock.reset();
 
       if (this.initialMove) {
-        if (this.canMove(false)) {
-          this.selectedBlock.x++;
-          this.initialMove = false;
-        }
+        this.timers.moveBlock.setResetTime(0);
+        this.initialMove = false;
       }
     }
 

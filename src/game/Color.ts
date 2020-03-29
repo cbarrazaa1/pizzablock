@@ -11,26 +11,24 @@ class Color {
   public static PURPLE = new Color(160, 0, 240, 255);
   public static RED = new Color(240, 0, 0, 255);
 
-  private r: number;
-  private g: number;
-  private b: number;
-  private a: number;
-  private strRep: Nullable<string>;
+  public r: number;
+  public g: number;
+  public b: number;
+  public a: number;
 
   constructor(r: number, g: number, b: number, a: number) {
     this.r = r;
     this.g = g;
     this.b = b;
     this.a = a;
-    this.strRep = null;
   }
 
   public toString(): string {
-    if (this.strRep != null) {
-      return this.strRep;
-    }
-
     return `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a / 255.0})`;
+  }
+
+  public copy(): Color {
+    return new Color(this.r, this.g, this.b, this.a);
   }
 }
 
