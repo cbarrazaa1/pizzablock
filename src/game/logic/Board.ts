@@ -62,50 +62,25 @@ function mapLevelToDropTimer(level: number): number {
 }
 
 class Board {
-  private mat: BlockData[][];
-  private selectedBlock: Block;
-  private timers: StrMap<Timer>;
-  private shouldSpawnBlock: boolean;
-  private initialMove: boolean;
-  private movingLeft: boolean;
-  private movingRight: boolean;
-  private clearingLines: boolean;
-  private gameOver: boolean;
-  private lineCounter: number;
+  private mat!: BlockData[][];
+  private selectedBlock!: Block;
+  private timers!: StrMap<Timer>;
+  private shouldSpawnBlock!: boolean;
+  private initialMove!: boolean;
+  private movingLeft!: boolean;
+  private movingRight!: boolean;
+  private clearingLines!: boolean;
+  private gameOver!: boolean;
+  private lineCounter!: number;
   private parent: Widget;
-  public clearedLines: number;
-  public level: number;
-  public score: number;
-  public nextBlock: Block;
+  public clearedLines!: number;
+  public level!: number;
+  public score!: number;
+  public nextBlock!: Block;
 
   constructor(parent: Widget) {
     this.parent = parent;
-    const emptyData: BlockData = {
-      value: 0,
-      color: Color.RED,
-    };
-
-    this.mat = new Array(BOARD_WIDTH)
-      .fill(null)
-      .map(() => new Array(BOARD_HEIGHT).fill(emptyData));
-
-    this.selectedBlock = new Block(4, 0);
-    this.nextBlock = new Block(4, 0);
-    this.level = 9;
-    this.timers = {
-      drop: new Timer(mapLevelToDropTimer(this.level)),
-      newBlock: new Timer(NEW_BLOCK_TIMER_DEFAULT),
-      moveBlock: new Timer(MOVE_BLOCK_TIMER_DEFAULT),
-    };
-    this.shouldSpawnBlock = false;
-    this.initialMove = false;
-    this.movingLeft = false;
-    this.movingRight = false;
-    this.clearingLines = false;
-    this.gameOver = false;
-    this.clearedLines = 0;
-    this.lineCounter = 0;
-    this.score = 0;
+    this.startGame();
   }
 
   private startGame(): void {
