@@ -285,6 +285,17 @@ class Block {
       position: this.applyRotationOffset(oldSimRot, simRotation),
     };
   }
+
+  public clearShape(): void {
+    const {shape} = this;
+    for (let i = 0; i < shape.rotations.length; i++) {
+      for (let j = 0; j < shape.rotations[i].length; j++) {
+        for (let k = 0; k < shape.rotations[i][j].length; k++) {
+          this.shape.rotations[i][j][k] = 0;
+        }
+      }
+    }
+  }
 }
 
 export default Block;

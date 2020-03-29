@@ -34,63 +34,127 @@ class Board {
   }
 
   public update(delta: number): void {
-    if (this.dropTimer >= 100) {
-      let shouldFall = true;
-      const {x, y, rotation, shape, color} = this.selectedBlock;
-      const shapeHeight = shape.rotations[rotation].length;
-      const shapeWidth = shape.rotations[rotation][0].length;
+    if (this.dropTimer >= 150) {
+      if (!this.shouldSpawnBlock) {
+        let shouldFall = true;
+        const {x, y, rotation, shape, color} = this.selectedBlock;
+        const shapeHeight = shape.rotations[rotation].length;
+        const shapeWidth = shape.rotations[rotation][0].length;
 
-      // check if at bottom
-      if (y + shapeHeight + 1 > BOARD_HEIGHT) {
-        shouldFall = false;
-        for (let i = 0; i < shapeWidth; i++) {
-          for (let j = 0; j < shapeHeight; j++) {
-            if (shape.rotations[rotation][j][i] === 1) {
-              this.mat[x + i][y + j] = {
-                color,
-                value: 1,
-              };
+        // check if at bottom
+        if (y + shapeHeight + 1 > BOARD_HEIGHT) {
+          shouldFall = false;
+          
+          for (let i = 0; i < shapeWidth; i++) {
+            for (let j = 0; j < shapeHeight; j++) {
+              if (shape.rotations[rotation][j][i] === 1) {
+                this.mat[x + i][y + j] = {
+                  color,
+                  value: 1,
+                };
+              }
             }
           }
+
+          this.selectedBlock.clearShape();
         }
-      }
 
-      // check if there is a block below
-      if (shouldFall) {
-        for (let i = 0; i < shapeWidth; i++) {
-          for (let j = 0; j < shapeHeight; j++) {
-            if (y + j + 1 > BOARD_HEIGHT) {
-              continue;
-            }
-
-            if (
-              shape.rotations[rotation][j][i] === 1 &&
-              this.mat[x + i][y + j + 1].value === 1
-            ) {
-              for (let ii = 0; ii < shapeWidth; ii++) {
-                for (let jj = 0; jj < shapeHeight; jj++) {
-                  if (shape.rotations[rotation][jj][ii] === 1) {
-                    this.mat[x + ii][y + jj] = {
-                      color,
-                      value: 1,
-                    };
-                  }
-                }
+        // check if there is a block below
+        if (shouldFall) {
+          for (let i = 0; i < shapeWidth; i++) {
+            for (let j = 0; j < shapeHeight; j++) {
+              if (y + j + 1 > BOARD_HEIGHT) {
+                continue;
               }
 
-              shouldFall = false;
+              if (
+                shape.rotations[rotation][j][i] === 1 &&
+                this.mat[x + i][y + j + 1].value === 1
+              ) {
+                for (let ii = 0; ii < shapeWidth; ii++) {
+                  for (let jj = 0; jj < shapeHeight; jj++) {
+                    if (shape.rotations[rotation][jj][ii] === 1) {
+                      this.mat[x + ii][y + jj] = {
+                        color,
+                        value: 1,
+                      };
+                    }
+                  }
+                }
+
+                this.selectedBlock.clearShape();
+                shouldFall = false;
+                break;
+              }
+            }
+
+            if (!shouldFall) {
               break;
             }
           }
         }
-      }
 
-      if (shouldFall) {
-        this.selectedBlock.y++;
-      } else {
-        this.shouldSpawnBlock = true;
-      }
+        if (shouldFall) {
+          this.selectedBlock.y++;
+        } else {
+          this.shouldSpawnBlock = true;
 
+          // check if any line was completed
+          const linesY = [];
+          const [startY, endY] = [y, y + shapeHeight - 1];
+          let completedLine = true;
+
+          for (let y = startY; y <= endY; y++) {
+            for (let x = 0; x < BOARD_WIDTH; x++) {
+              if (this.mat[x][y].value !== 1) {
+                completedLine = false;
+                break;
+              }
+            }
+
+            if (completedLine) {
+              linesY.push(y);
+
+              // delete line
+              for (let xx = 0; xx < BOARD_WIDTH; xx++) {
+                this.mat[xx][y].value = 0;
+              }
+            } else {
+              completedLine = true;
+            }
+          }
+
+          // shift blocks above cleared lines
+          if (linesY.length > 0) {
+            let sequentialClear = true;
+
+            // check if lines were cleared separately (can only happen with 2 line clears)
+            if (linesY.length === 2) {
+              if (linesY[1] - linesY[0] !== 1) {
+                sequentialClear = false;
+              }
+            }
+
+            // shift blocks
+            const shiftBlocks = (clearY: number, shiftCount: number): void => {
+              for (let y = clearY - 1; y >= 0; y--) {
+                for (let x = 0; x < BOARD_WIDTH; x++) {
+                  this.mat[x][y + shiftCount] = {...this.mat[x][y]};
+                  this.mat[x][y].value = 0;
+                }
+              }
+            }
+
+            if (sequentialClear) {
+              shiftBlocks(linesY[0], linesY.length);
+            } else {
+              shiftBlocks(linesY[0], 1);
+              shiftBlocks(linesY[1], 1);
+            }
+          }
+
+        }
+      }
       this.dropTimer = 0;
     }
     this.dropTimer += delta;
