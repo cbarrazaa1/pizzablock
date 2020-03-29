@@ -75,7 +75,7 @@ class SingleplayerState extends State {
               g.fillStyle = color.toString();
               g.fillRect(
                 self.getRealX() + parentWidth / 2 - actualWidth / 2 + i * 32,
-                self.getRealY() + parentHeight / 2 - actualHeight / 2 + j * 32,
+                self.getRealY() - 10 + parentHeight / 2 - actualHeight / 2 + j * 32,
                 32,
                 32,
               );
@@ -84,8 +84,9 @@ class SingleplayerState extends State {
         }
       });
 
-    this.cntNextBlock = new Container(boardXWidth + 20, boardY + 241, 150, 150)
+    this.cntNextBlock = new Container(boardXWidth + 20, boardY + 241, 150, 130)
       .addChild('nextBlock', this.nextBlock)
+      .addChild('label', new Text(0, 100, 'Next').centerHorizontally())
       .setStyle(cntStyle);
 
     this.cntBoard = new Container(
