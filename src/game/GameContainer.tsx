@@ -23,6 +23,7 @@ function GameContainer(): JSX.Element {
     let lastTick = new Date().getTime();
     let currentTick = 0;
     let animationFrameID = requestAnimationFrame(run);
+    canvas.current!.focus();
 
     function run(): void {
       currentTick = new Date().getTime();
