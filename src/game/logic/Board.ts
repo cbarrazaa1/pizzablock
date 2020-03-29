@@ -1,7 +1,7 @@
 import Color from '../Color';
 import Block from './Block';
 import InputHandler, {InputEvent, InputKey} from '../InputHandler';
-import { StrMap } from '../../util/Types';
+import {StrMap} from '../../util/Types';
 import Timer from '../Timer';
 
 const TWEEN = require('@tweenjs/tween.js').default;
@@ -160,7 +160,7 @@ class Board {
         // check if at bottom
         if (y + shapeHeight + 1 > BOARD_HEIGHT) {
           shouldFall = false;
-          
+
           for (let i = 0; i < shapeWidth; i++) {
             for (let j = 0; j < shapeHeight; j++) {
               if (shape.rotations[rotation][j][i] === 1) {
@@ -220,7 +220,7 @@ class Board {
             const linesY: number[] = [];
             const [startY, endY] = [y, y + shapeHeight - 1];
             let completedLine = true;
-  
+
             for (let y = startY; y <= endY; y++) {
               for (let x = 0; x < BOARD_WIDTH; x++) {
                 if (this.mat[x][y].value !== 1) {
@@ -228,28 +228,31 @@ class Board {
                   break;
                 }
               }
-  
+
               const checkShiftBlocks = (): void => {
                 if (linesY.length > 0) {
                   let sequentialClear = true;
-      
+
                   // check if lines were cleared separately (can only happen with 2 line clears)
                   if (linesY.length === 2) {
                     if (linesY[1] - linesY[0] !== 1) {
                       sequentialClear = false;
                     }
                   }
-      
+
                   // shift blocks down
-                  const shiftBlocks = (clearY: number, shiftCount: number): void => {
+                  const shiftBlocks = (
+                    clearY: number,
+                    shiftCount: number,
+                  ): void => {
                     for (let y = clearY - 1; y >= 0; y--) {
                       for (let x = 0; x < BOARD_WIDTH; x++) {
                         this.mat[x][y + shiftCount] = {...this.mat[x][y]};
                         this.mat[x][y].value = 0;
                       }
                     }
-                  }
-      
+                  };
+
                   if (sequentialClear) {
                     shiftBlocks(linesY[0], linesY.length);
                   } else {
@@ -257,43 +260,48 @@ class Board {
                     shiftBlocks(linesY[1], 1);
                   }
                 }
-              }
-  
+              };
+
               if (completedLine) {
                 linesY.push(y);
                 this.clearingLines = true;
-                
+
                 // delete line
                 for (let xx = 0; xx < BOARD_WIDTH; xx++) {
                   (function(xx, self) {
                     new TWEEN.Tween({
                       alpha: self.mat[xx][y].color.a,
                     })
-                    .to({alpha: 0}, 200 + (xx * 40))
-                    .onUpdate((obj: any) => {
-                      self.mat[xx][y].color.a = obj.alpha;
-                    })
-                    .onComplete(() => {
-                      self.mat[xx][y].value = 0;
+                      .to({alpha: 0}, 200 + xx * 40)
+                      .onUpdate((obj: any) => {
+                        self.mat[xx][y].color.a = obj.alpha;
+                      })
+                      .onComplete(() => {
+                        self.mat[xx][y].value = 0;
 
-                      if (xx === BOARD_WIDTH - 1 && y === linesY[linesY.length - 1]) {
-                        checkShiftBlocks();
-                        self.clearingLines = false;
-                        self.timers.newBlock.setResetTime(0);
-                        self.clearedLines += linesY.length;
-                        self.lineCounter += linesY.length;
-                        self.score += self.calcLineClearScore(linesY.length);
+                        if (
+                          xx === BOARD_WIDTH - 1 &&
+                          y === linesY[linesY.length - 1]
+                        ) {
+                          checkShiftBlocks();
+                          self.clearingLines = false;
+                          self.timers.newBlock.setResetTime(0);
+                          self.clearedLines += linesY.length;
+                          self.lineCounter += linesY.length;
+                          self.score += self.calcLineClearScore(linesY.length);
 
-                        // level up
-                        if (self.lineCounter >= 10) {
-                          self.level++;
-                          self.timers.drop.setResetTime(mapLevelToDropTimer(self.level));
-                          self.lineCounter = 0;
+                          // level up
+                          if (self.lineCounter >= 10) {
+                            self.level++;
+                            self.timers.drop.setResetTime(
+                              mapLevelToDropTimer(self.level),
+                            );
+                            self.lineCounter = 0;
+                          }
                         }
-                      }
-                    })
-                    .start();
-                  })(xx, this)
+                      })
+                      .start();
+                  })(xx, this);
                 }
               } else {
                 completedLine = true;
@@ -394,6 +402,7 @@ class Board {
     const borderColor = new Color(80, 80, 80, 255).toString();
 
     g.strokeStyle = borderColor;
+    g.lineWidth = 1;
     g.strokeRect(BOARD_X, BOARD_Y, BOARD_WIDTH * 32, BOARD_HEIGHT * 32);
 
     // render board
@@ -422,7 +431,7 @@ class Board {
         }
       }
     }
-    
+
     // project the block shadow to the bottom and find the closest possible collision
     let shadowY = BOARD_HEIGHT - shapeHeight;
     let changedShadowY = false;
@@ -481,7 +490,12 @@ class Board {
           let shadowColor = color.copy();
           shadowColor.a = 100;
           g.fillStyle = shadowColor.toString();
-          g.fillRect((x + i) * 32 + BOARD_X, (shadowY + j) * 32 + BOARD_Y, 32, 32);
+          g.fillRect(
+            (x + i) * 32 + BOARD_X,
+            (shadowY + j) * 32 + BOARD_Y,
+            32,
+            32,
+          );
         }
       }
     }
@@ -494,19 +508,19 @@ class Board {
       g.fillStyle = 'rgba(0, 0, 0, 0.6)';
       g.fillRect(BOARD_X - 1, BOARD_Y - 1, width + 2, height + 2);
 
-      let text = "Game Over";
+      let text = 'Game Over';
       let size = null;
-      
+
       g.fillStyle = 'white';
-      g.font = "30px Arial";
+      g.font = '30px Arial';
       size = g.measureText(text);
-      g.fillText(text, BOARD_X + (width / 2) - (size.width / 2), height / 2);
-      
-      g.font = "16px Arial";
-      text = "Press Enter to play again.";
+      g.fillText(text, BOARD_X + width / 2 - size.width / 2, height / 2);
+
+      g.font = '16px Arial';
+      text = 'Press Enter to play again.';
       size = g.measureText(text);
 
-      g.fillText(text, BOARD_X + (width / 2) - (size.width / 2), (height / 2) + 26);
+      g.fillText(text, BOARD_X + width / 2 - size.width / 2, height / 2 + 26);
     }
   }
 

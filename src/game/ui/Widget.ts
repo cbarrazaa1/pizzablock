@@ -1,4 +1,4 @@
-import { Nullable } from "../../util/Types";
+import {Nullable} from '../../util/Types';
 import {InputEvent} from '../InputHandler';
 
 export interface StyleProps {}

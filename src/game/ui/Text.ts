@@ -1,6 +1,6 @@
-import { InputEvent } from "../InputHandler";
-import Widget, { StyleProps } from "./Widget";
-import Color from "../Color";
+import {InputEvent} from '../InputHandler';
+import Widget, {StyleProps} from './Widget';
+import Color from '../Color';
 
 export interface TextStyleProps extends StyleProps {
   textColor?: Color;
@@ -13,7 +13,7 @@ function getDefaultStyle(): TextStyleProps {
     textColor: Color.WHITE.copy(),
     fontName: 'Arial',
     fontSize: 20,
-  }
+  };
 }
 
 class Text extends Widget {
@@ -57,9 +57,10 @@ class Text extends Widget {
       if (this.centeredHorizontally) {
         this.x = this.parent.width / 2 - size.width / 2;
       }
-  
+
       if (this.centeredVertically) {
-        const height = size.actualBoundingBoxAscent + size.actualBoundingBoxDescent;
+        const height =
+          size.actualBoundingBoxAscent + size.actualBoundingBoxDescent;
         this.y = this.parent.height / 2 - height / 2;
       }
     }
@@ -73,7 +74,7 @@ class Text extends Widget {
     const style = this.style as TextStyleProps;
     const size = style.fontSize!;
     const name = style.fontName!;
-    return `${size}px ${name}`
+    return `${size}px ${name}`;
   }
 }
 

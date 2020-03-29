@@ -7,7 +7,7 @@ import Board, {
   BOARD_WIDTH,
   BOARD_HEIGHT,
 } from '../logic/Board';
-import Container from '../ui/Container';
+import Container, {ContainerStyleProps} from '../ui/Container';
 import Color from '../Color';
 import Text from '../ui/Text';
 import WidgetManager from '../ui/WidgetManager';
@@ -27,30 +27,31 @@ class SingleplayerState extends State {
     super();
     this.board = new Board();
     const boardXWidth = BOARD_X + BOARD_WIDTH * 32;
-    
-    this.txtLines = new Text(0, 0, 'Lines: 0').centerHorizontally().centerVertically();
-    this.cntLines = new Container(
-      boardXWidth + 10,
-      BOARD_Y,
-      200,
-      60,
-    ).addChildren('lineCount', this.txtLines);
+    const cntStyle: ContainerStyleProps = {
+      borderWidth: 4,
+      borderColor: new Color(80, 80, 80, 255),
+    };
 
-    this.txtLevel = new Text(0, 0, 'Level: 0').centerHorizontally().centerVertically();
-    this.cntLevel = new Container(
-      boardXWidth + 10,
-      BOARD_Y + 80,
-      200,
-      60,
-    ).addChildren('lvlCount', this.txtLevel);
+    this.txtLines = new Text(0, 0, 'Lines: 0')
+      .centerHorizontally()
+      .centerVertically();
+    this.cntLines = new Container(boardXWidth + 20, BOARD_Y + 1, 200, 60)
+      .addChildren('lineCount', this.txtLines)
+      .setStyle(cntStyle);
 
-    this.txtScore = new Text(0, 0, 'Score: 0').centerHorizontally().centerVertically();
-    this.cntScore = new Container(
-      boardXWidth + 10,
-      BOARD_Y + 160,
-      200,
-      60,
-    ).addChildren('scoreCount', this.txtScore);
+    this.txtLevel = new Text(0, 0, 'Level: 0')
+      .centerHorizontally()
+      .centerVertically();
+    this.cntLevel = new Container(boardXWidth + 20, BOARD_Y + 81, 200, 60)
+      .addChildren('lvlCount', this.txtLevel)
+      .setStyle(cntStyle);
+
+    this.txtScore = new Text(0, 0, 'Score: 0')
+      .centerHorizontally()
+      .centerVertically();
+    this.cntScore = new Container(boardXWidth + 20, BOARD_Y + 161, 200, 60)
+      .addChildren('scoreCount', this.txtScore)
+      .setStyle(cntStyle);
 
     this.widgets = new WidgetManager()
       .addWidget('cntLines', this.cntLines)

@@ -1,6 +1,6 @@
-import Widget from "./Widget";
-import { StrMap, Nullable } from "../../util/Types";
-import { InputEvent } from "../InputHandler";
+import Widget from './Widget';
+import {StrMap, Nullable} from '../../util/Types';
+import {InputEvent} from '../InputHandler';
 
 class WidgetManager {
   private widgets: StrMap<Widget>;
@@ -26,7 +26,7 @@ class WidgetManager {
   public update(delta: number): void {
     Object.values(this.widgets).forEach(widget => widget.update(delta));
   }
-  
+
   public input(e: InputEvent): void {
     Object.values(this.widgets).forEach(widget => widget.input(e));
   }

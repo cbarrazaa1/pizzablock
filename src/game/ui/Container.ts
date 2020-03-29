@@ -1,13 +1,12 @@
-import Widget, { StyleProps } from "./Widget";
-import Color from "../Color";
-import { StrMap, Nullable } from "../../util/Types";
+import Widget, {StyleProps} from './Widget';
+import Color from '../Color';
+import {StrMap, Nullable} from '../../util/Types';
 import {InputEvent} from '../InputHandler';
 
 export interface ContainerStyleProps extends StyleProps {
   backgroundColor?: Color;
   borderColor?: Color;
   borderWidth?: number;
-  borderRadius?: number;
 }
 
 function getDefaultStyle(): ContainerStyleProps {
@@ -15,8 +14,7 @@ function getDefaultStyle(): ContainerStyleProps {
     backgroundColor: Color.BLACK.copy(),
     borderColor: Color.WHITE.copy(),
     borderWidth: 1,
-    borderRadius: 0,
-  }
+  };
 }
 
 class Container extends Widget {
@@ -50,7 +48,7 @@ class Container extends Widget {
   public update(delta: number): void {
     Object.values(this.children).forEach(child => child.update(delta));
   }
-  
+
   public input(e: InputEvent): void {
     Object.values(this.children).forEach(child => child.input(e));
   }
