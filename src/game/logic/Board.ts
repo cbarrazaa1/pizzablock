@@ -13,7 +13,7 @@ interface BlockData {
 
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
-const DROP_TIMER_DEFAULT = 100;
+const DROP_TIMER_DEFAULT = 300;
 const NEW_BLOCK_TIMER_DEFAULT = 280;
 const MOVE_BLOCK_TIMER_DEFAULT = 110;
 
@@ -300,6 +300,70 @@ class Board {
         if (shape.rotations[rotation][j][i] === 1) {
           g.fillStyle = color.toString();
           g.fillRect((x + i) * 32 + pos.x, (y + j) * 32 + pos.y, 32, 32);
+        }
+      }
+    }
+
+    
+    // project the block shadow to the bottom and find the closest possible collision
+    let shadowY = BOARD_HEIGHT - shapeHeight;
+    let changedShadowY = false;
+    for (let scanY = y + shapeHeight; scanY < BOARD_HEIGHT; scanY++) {
+      for (let scanX = x; scanX <= x + shapeWidth - 1; scanX++) {
+        if (this.mat[scanX][scanY].value === 1) {
+          shadowY = scanY - shapeHeight;
+          changedShadowY = true;
+          break;
+        }
+      }
+
+      if (changedShadowY) {
+        break;
+      }
+    }
+
+    // try to fit a bit lower if possible
+    let endSimulation = false;
+    let originalShadowY = shadowY;
+    if (changedShadowY) {
+      for (let sim = 1; sim <= shapeHeight; sim++) {
+        for (let i = 0; i < shapeWidth; i++) {
+          for (let j = 0; j < shapeHeight; j++) {
+            if (shape.rotations[rotation][j][i] === 1) {
+              let ySim = originalShadowY + j + sim;
+              if (ySim >= BOARD_HEIGHT) {
+                endSimulation = true;
+                break;
+              }
+
+              if (this.mat[x + i][ySim].value === 1) {
+                endSimulation = true;
+                break;
+              }
+            }
+          }
+
+          if (endSimulation) {
+            break;
+          }
+        }
+
+        if (endSimulation) {
+          break;
+        } else {
+          shadowY = originalShadowY + sim;
+        }
+      }
+    }
+
+    // render shadow block
+    for (let i = 0; i < shapeWidth; i++) {
+      for (let j = 0; j < shapeHeight; j++) {
+        if (shape.rotations[rotation][j][i] === 1) {
+          let shadowColor = color.copy();
+          shadowColor.a = 100;
+          g.fillStyle = shadowColor.toString();
+          g.fillRect((x + i) * 32 + pos.x, (shadowY + j) * 32 + pos.y, 32, 32);
         }
       }
     }
