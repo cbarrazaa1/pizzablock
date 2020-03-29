@@ -19,6 +19,10 @@ class Timer {
 
     return false;
   }
+
+  public reset(): void {
+    this.accumulatedTime = 0;
+  }
 }
 
 export default Timer;

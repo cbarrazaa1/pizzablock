@@ -17,6 +17,9 @@ class Board {
   private selectedBlock: Block;
   private timers: StrMap<Timer>;
   private shouldSpawnBlock: boolean;
+  private initialMove: boolean;
+  private movingLeft: boolean;
+  private movingRight: boolean;
 
   constructor() {
     const emptyData: BlockData = {
@@ -32,8 +35,12 @@ class Board {
     this.timers = {
       drop: new Timer(50),
       newBlock: new Timer(260),
+      moveBlock: new Timer(110),
     };
     this.shouldSpawnBlock = false;
+    this.initialMove = false;
+    this.movingLeft = false;
+    this.movingRight = false;
   }
 
   public update(delta: number): void {
@@ -169,18 +176,55 @@ class Board {
       }
       this.timers.newBlock.tick(delta);
     }
+
+    // selected block movement
+    if (this.timers.moveBlock.isActivated()) {
+      if (this.movingLeft) {
+        if (this.canMove(true)) {
+          this.selectedBlock.x--;
+        }
+      } else if (this.movingRight) {
+        if (this.canMove(false)) {
+          this.selectedBlock.x++;
+        }
+      }
+    }
+    this.timers.moveBlock.tick(delta);
   }
 
   public input(e: InputEvent): void {
-    // movement
+    // start movement
     if (InputHandler.isKeyDown(InputKey.LEFT, e)) {
-      if (this.canMove(true)) {
-        this.selectedBlock.x--;
+      this.movingLeft = true;
+      this.movingRight = false;
+      this.timers.moveBlock.reset();
+
+      if (this.initialMove) {
+        if (this.canMove(true)) {
+          this.selectedBlock.x--;
+          this.initialMove = false;
+        }
       }
     } else if (InputHandler.isKeyDown(InputKey.RIGHT, e)) {
-      if (this.canMove(false)) {
-        this.selectedBlock.x++;
+      this.movingLeft = false;
+      this.movingRight = true;
+      this.timers.moveBlock.reset();
+
+      if (this.initialMove) {
+        if (this.canMove(false)) {
+          this.selectedBlock.x++;
+          this.initialMove = false;
+        }
       }
+    }
+
+    // end movement
+    if (InputHandler.isKeyUp(InputKey.LEFT, e)) {
+      this.movingLeft = false;
+      this.initialMove = true;
+    } else if (InputHandler.isKeyUp(InputKey.RIGHT, e)) {
+      this.movingRight = false;
+      this.initialMove = true;
     }
 
     // rotation

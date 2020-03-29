@@ -17,6 +17,7 @@ export enum InputButton {
 
 interface InputHandler {
   readonly isKeyDown: (key: InputKey, e: InputEvent) => boolean;
+  readonly isKeyUp: (key: InputKey, e: InputEvent) => boolean;
   readonly isMouseDown: (button: InputButton, e: InputEvent) => boolean;
 }
 
@@ -24,6 +25,14 @@ const inputHandler: InputHandler = {
   isKeyDown: (key: InputKey, e: InputEvent): boolean => {
     const ev = e as React.KeyboardEvent;
     if (ev.type === 'keydown') {
+      return ev.key === key;
+    }
+
+    return false;
+  },
+  isKeyUp: (key: InputKey, e: InputEvent): boolean => {
+    const ev = e as React.KeyboardEvent;
+    if (ev.type === 'keyup') {
       return ev.key === key;
     }
 
