@@ -205,7 +205,6 @@ class Board {
 
     // selected block movement
     if (this.timers.moveBlock.isActivated()) {
-      console.log('hi')
       if (this.movingLeft) {
         if (this.canMove(true)) {
           this.selectedBlock.x--;
