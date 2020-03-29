@@ -1,15 +1,13 @@
 import State from './State';
 import {InputEvent} from '../InputHandler';
 import {Nullable} from '../../util/Types';
-import Board, {
-  BOARD_X,
-  BOARD_Y,
-  BOARD_WIDTH,
-} from '../logic/Board';
+import Board, {BOARD_X, BOARD_Y, BOARD_WIDTH} from '../logic/Board';
 import Container, {ContainerStyleProps} from '../ui/Container';
 import Color from '../Color';
 import Text from '../ui/Text';
 import WidgetManager from '../ui/WidgetManager';
+import CustomWidget from '../ui/CustomWidget';
+import Block from '../logic/Block';
 
 class SingleplayerState extends State {
   private static instance: Nullable<SingleplayerState> = null;
@@ -21,6 +19,8 @@ class SingleplayerState extends State {
   private txtLevel: Text;
   private cntScore: Container;
   private txtScore: Text;
+  private cntNextBlock: Container;
+  private nextBlock: CustomWidget;
 
   constructor() {
     super();
@@ -52,10 +52,43 @@ class SingleplayerState extends State {
       .addChildren('scoreCount', this.txtScore)
       .setStyle(cntStyle);
 
+    this.nextBlock = new CustomWidget()
+      .onUpdate((self: CustomWidget, delta: number): void => {
+        self.data['block'] = this.board.nextBlock;
+      })
+      .onRender((self: CustomWidget, g: CanvasRenderingContext2D): void => {
+        const {shape, rotation, color} = self.data['block'] as Block;
+        const shapeHeight = shape.rotations[rotation].length;
+        const shapeWidth = shape.rotations[rotation][0].length;
+        const actualWidth = shapeWidth * 32;
+        const actualHeight = shapeHeight * 32;
+        const parentWidth = self.parent!.width;
+        const parentHeight = self.parent!.height;
+
+        for (let i = 0; i < shapeWidth; i++) {
+          for (let j = 0; j < shapeHeight; j++) {
+            if (shape.rotations[rotation][j][i] === 1) {
+              g.fillStyle = color.toString();
+              g.fillRect(
+                self.getRealX() + parentWidth / 2 - actualWidth / 2 + i * 32,
+                self.getRealY() + parentHeight / 2 - actualHeight / 2 + j * 32,
+                32,
+                32,
+              );
+            }
+          }
+        }
+      });
+
+    this.cntNextBlock = new Container(boardXWidth + 20, BOARD_Y + 241, 150, 150)
+      .addChildren('nextBlock', this.nextBlock)
+      .setStyle(cntStyle);
+
     this.widgets = new WidgetManager()
       .addWidget('cntLines', this.cntLines)
       .addWidget('cntLevel', this.cntLevel)
-      .addWidget('cntScore', this.cntScore);
+      .addWidget('cntScore', this.cntScore)
+      .addWidget('cntNextBlock', this.cntNextBlock);
   }
 
   public static getInstance(): SingleplayerState {

@@ -3,6 +3,7 @@ import Block from './Block';
 import InputHandler, {InputEvent, InputKey} from '../InputHandler';
 import {StrMap} from '../../util/Types';
 import Timer from '../Timer';
+import _ from 'lodash';
 
 const TWEEN = require('@tweenjs/tween.js').default;
 
@@ -75,6 +76,7 @@ class Board {
   public clearedLines: number;
   public level: number;
   public score: number;
+  public nextBlock: Block;
 
   constructor() {
     const emptyData: BlockData = {
@@ -87,6 +89,7 @@ class Board {
       .map(() => new Array(BOARD_HEIGHT).fill(emptyData));
 
     this.selectedBlock = new Block(4, 0);
+    this.nextBlock = new Block(4, 0);
     this.level = 9;
     this.timers = {
       drop: new Timer(mapLevelToDropTimer(this.level)),
@@ -115,6 +118,7 @@ class Board {
       .map(() => new Array(BOARD_HEIGHT).fill(emptyData));
 
     this.selectedBlock = new Block(4, 0);
+    this.nextBlock = new Block(4, 0);
     this.level = 9;
     this.timers = {
       drop: new Timer(mapLevelToDropTimer(this.level)),
@@ -316,7 +320,8 @@ class Board {
     // timer to spawn new block
     if (this.shouldSpawnBlock && !this.clearingLines) {
       if (this.timers.newBlock.isActivated()) {
-        this.selectedBlock = new Block(4, 0);
+        this.selectedBlock = _.cloneDeep(this.nextBlock);
+        this.nextBlock = new Block(4, 0);
         this.shouldSpawnBlock = false;
         this.timers.newBlock.setResetTime(NEW_BLOCK_TIMER_DEFAULT);
       }

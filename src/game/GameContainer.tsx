@@ -30,8 +30,8 @@ function GameContainer(): JSX.Element {
       delta = currentTick - lastTick;
 
       if (delta > timestep) {
-        game?.render();
         game?.update(delta);
+        game?.render();
 
         lastTick = currentTick - (delta % timestep);
       }
