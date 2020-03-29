@@ -4,6 +4,7 @@ import InputHandler, {InputEvent, InputKey} from '../InputHandler';
 import {StrMap} from '../../util/Types';
 import Timer from '../Timer';
 import _ from 'lodash';
+import Widget from '../ui/Widget';
 
 const TWEEN = require('@tweenjs/tween.js').default;
 
@@ -12,8 +13,6 @@ interface BlockData {
   color: Color;
 }
 
-export const BOARD_X = 10;
-export const BOARD_Y = 10;
 export const BOARD_WIDTH = 10;
 export const BOARD_HEIGHT = 20;
 const NEW_BLOCK_TIMER_DEFAULT = 280;
@@ -73,12 +72,14 @@ class Board {
   private clearingLines: boolean;
   private gameOver: boolean;
   private lineCounter: number;
+  private parent: Widget;
   public clearedLines: number;
   public level: number;
   public score: number;
   public nextBlock: Block;
 
-  constructor() {
+  constructor(parent: Widget) {
+    this.parent = parent;
     const emptyData: BlockData = {
       value: 0,
       color: Color.RED,
@@ -405,7 +406,9 @@ class Board {
 
   public render(g: CanvasRenderingContext2D): void {
     const borderColor = new Color(80, 80, 80, 255).toString();
-
+    const BOARD_X = this.parent.getRealX();
+    const BOARD_Y = this.parent.getRealY();
+    
     g.strokeStyle = borderColor;
     g.lineWidth = 1;
     g.strokeRect(BOARD_X, BOARD_Y, BOARD_WIDTH * 32, BOARD_HEIGHT * 32);

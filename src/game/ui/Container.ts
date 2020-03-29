@@ -55,10 +55,14 @@ class Container extends Widget {
 
   public render(g: CanvasRenderingContext2D): void {
     const style = this.style as ContainerStyleProps;
-    g.fillStyle = (style.backgroundColor ?? Color.BLACK.copy()).toString();
+    g.fillStyle = style.backgroundColor!.toString();
     g.lineJoin = 'round';
-    g.lineWidth = style.borderWidth ?? 1;
-    g.strokeStyle = (style.borderColor ?? Color.WHITE.copy()).toString();
+    g.lineWidth = style.borderWidth!;
+    g.strokeStyle = style.borderColor!.toString();
+
+    if (style.borderWidth! === 0) {
+      g.strokeStyle = 'rgba(0, 0, 0, 0)';
+    }
 
     const x = this.getRealX();
     const y = this.getRealY();

@@ -26,19 +26,27 @@ abstract class Widget {
   }
 
   public getRealX(): number {
-    if (this.parent == null) {
-      return this.x;
+    let curr = this.parent;
+    let res = this.x;
+
+    while (curr != null) {
+      res += curr.x;
+      curr = curr.parent;
     }
 
-    return this.x + this.parent.x;
+    return res;
   }
 
   public getRealY(): number {
-    if (this.parent == null) {
-      return this.y;
+    let curr = this.parent;
+    let res = this.y;
+
+    while (curr != null) {
+      res += curr.y;
+      curr = curr.parent;
     }
 
-    return this.y + this.parent.y;
+    return res;
   }
 
   public abstract update(delta: number): void;
