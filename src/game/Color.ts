@@ -1,5 +1,3 @@
-import {Nullable} from '../util/Types';
-
 class Color {
   public static BLACK = new Color(0, 0, 0, 255);
   public static WHITE = new Color(255, 255, 255, 255);
