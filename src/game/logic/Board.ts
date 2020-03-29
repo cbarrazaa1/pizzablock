@@ -13,6 +13,9 @@ interface BlockData {
 
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
+const DROP_TIMER_DEFAULT = 100;
+const NEW_BLOCK_TIMER_DEFAULT = 280;
+const MOVE_BLOCK_TIMER_DEFAULT = 110;
 
 class Board {
   private mat: BlockData[][];
@@ -36,9 +39,9 @@ class Board {
 
     this.selectedBlock = new Block(4, 0);
     this.timers = {
-      drop: new Timer(100),
-      newBlock: new Timer(280),
-      moveBlock: new Timer(110),
+      drop: new Timer(DROP_TIMER_DEFAULT),
+      newBlock: new Timer(NEW_BLOCK_TIMER_DEFAULT),
+      moveBlock: new Timer(MOVE_BLOCK_TIMER_DEFAULT),
     };
     this.shouldSpawnBlock = false;
     this.initialMove = false;
@@ -198,7 +201,7 @@ class Board {
       if (this.timers.newBlock.isActivated()) {
         this.selectedBlock = new Block(4, 0);
         this.shouldSpawnBlock = false;
-        this.timers.newBlock.setResetTime(280);
+        this.timers.newBlock.setResetTime(NEW_BLOCK_TIMER_DEFAULT);
       }
       this.timers.newBlock.tick(delta);
     }
@@ -215,7 +218,7 @@ class Board {
         }
       }
 
-      this.timers.moveBlock.setResetTime(110);
+      this.timers.moveBlock.setResetTime(MOVE_BLOCK_TIMER_DEFAULT);
     }
     this.timers.moveBlock.tick(delta);
 
