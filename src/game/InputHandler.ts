@@ -7,6 +7,7 @@ export enum InputKey {
   RIGHT = 'ArrowRight',
   Z = 'z',
   X = 'x',
+  ENTER = 'Enter',
 }
 
 export enum InputButton {

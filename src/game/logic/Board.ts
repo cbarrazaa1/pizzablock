@@ -11,9 +11,11 @@ interface BlockData {
   color: Color;
 }
 
+const BOARD_X = 10;
+const BOARD_Y = 10;
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
-const DROP_TIMER_DEFAULT = 300;
+const DROP_TIMER_DEFAULT = 30;
 const NEW_BLOCK_TIMER_DEFAULT = 280;
 const MOVE_BLOCK_TIMER_DEFAULT = 110;
 
@@ -26,6 +28,7 @@ class Board {
   private movingLeft: boolean;
   private movingRight: boolean;
   private clearingLines: boolean;
+  private gameOver: boolean;
 
   constructor() {
     const emptyData: BlockData = {
@@ -48,9 +51,38 @@ class Board {
     this.movingLeft = false;
     this.movingRight = false;
     this.clearingLines = false;
+    this.gameOver = false;
+  }
+
+  private startGame(): void {
+    const emptyData: BlockData = {
+      value: 0,
+      color: Color.RED,
+    };
+
+    this.mat = new Array(BOARD_WIDTH)
+      .fill(null)
+      .map(() => new Array(BOARD_HEIGHT).fill(emptyData));
+
+    this.selectedBlock = new Block(4, 0);
+    this.timers = {
+      drop: new Timer(DROP_TIMER_DEFAULT),
+      newBlock: new Timer(NEW_BLOCK_TIMER_DEFAULT),
+      moveBlock: new Timer(MOVE_BLOCK_TIMER_DEFAULT),
+    };
+    this.shouldSpawnBlock = false;
+    this.initialMove = false;
+    this.movingLeft = false;
+    this.movingRight = false;
+    this.clearingLines = false;
+    this.gameOver = false;
   }
 
   public update(delta: number): void {
+    if (this.gameOver) {
+      return;
+    }
+
     if (this.timers.drop.isActivated()) {
       if (!this.shouldSpawnBlock) {
         let shouldFall = true;
@@ -222,6 +254,13 @@ class Board {
     }
     this.timers.moveBlock.tick(delta);
 
+    // check game over
+    for (let x = 4; x <= 7; x++) {
+      if (this.mat[x][0].value === 1) {
+        this.gameOver = true;
+      }
+    }
+
     // update tween engine
     TWEEN.update();
   }
@@ -265,27 +304,30 @@ class Board {
         this.selectedBlock.rotateCCW();
       }
     }
+
+    // restart game
+    if (this.gameOver) {
+      if (InputHandler.isKeyUp(InputKey.ENTER, e)) {
+        this.startGame();
+      }
+    }
   }
 
   public render(g: CanvasRenderingContext2D): void {
-    const pos = {
-      x: 10,
-      y: 10,
-    };
     const borderColor = new Color(80, 80, 80, 255).toString();
 
     g.strokeStyle = borderColor;
-    g.strokeRect(pos.x, pos.y, BOARD_WIDTH * 32, BOARD_HEIGHT * 32);
+    g.strokeRect(BOARD_X, BOARD_Y, BOARD_WIDTH * 32, BOARD_HEIGHT * 32);
 
     // render board
     for (let x = 0; x < BOARD_WIDTH; x++) {
       for (let y = 0; y < BOARD_HEIGHT; y++) {
         if (this.mat[x][y].value === 1) {
           g.fillStyle = this.mat[x][y].color.toString();
-          g.fillRect(x * 32 + pos.x, y * 32 + pos.y, 32, 32);
+          g.fillRect(x * 32 + BOARD_X, y * 32 + BOARD_Y, 32, 32);
         } else {
           g.strokeStyle = borderColor;
-          g.strokeRect(x * 32 + pos.x, y * 32 + pos.y, 32, 32);
+          g.strokeRect(x * 32 + BOARD_X, y * 32 + BOARD_Y, 32, 32);
         }
       }
     }
@@ -299,11 +341,10 @@ class Board {
       for (let j = 0; j < shapeHeight; j++) {
         if (shape.rotations[rotation][j][i] === 1) {
           g.fillStyle = color.toString();
-          g.fillRect((x + i) * 32 + pos.x, (y + j) * 32 + pos.y, 32, 32);
+          g.fillRect((x + i) * 32 + BOARD_X, (y + j) * 32 + BOARD_Y, 32, 32);
         }
       }
     }
-
     
     // project the block shadow to the bottom and find the closest possible collision
     let shadowY = BOARD_HEIGHT - shapeHeight;
@@ -363,9 +404,32 @@ class Board {
           let shadowColor = color.copy();
           shadowColor.a = 100;
           g.fillStyle = shadowColor.toString();
-          g.fillRect((x + i) * 32 + pos.x, (shadowY + j) * 32 + pos.y, 32, 32);
+          g.fillRect((x + i) * 32 + BOARD_X, (shadowY + j) * 32 + BOARD_Y, 32, 32);
         }
       }
+    }
+
+    // render game over
+    if (this.gameOver) {
+      const width = BOARD_WIDTH * 32;
+      const height = BOARD_HEIGHT * 32;
+
+      g.fillStyle = 'rgba(0, 0, 0, 0.6)';
+      g.fillRect(BOARD_X - 1, BOARD_Y - 1, width + 2, height + 2);
+
+      let text = "Game Over";
+      let size = null;
+      
+      g.fillStyle = 'white';
+      g.font = "30px Arial";
+      size = g.measureText(text);
+      g.fillText(text, BOARD_X + (width / 2) - (size.width / 2), height / 2);
+      
+      g.font = "16px Arial";
+      text = "Press Enter to play again.";
+      size = g.measureText(text);
+
+      g.fillText(text, BOARD_X + (width / 2) - (size.width / 2), (height / 2) + 26);
     }
   }
 
