@@ -5,7 +5,6 @@ import Board, {
   BOARD_X,
   BOARD_Y,
   BOARD_WIDTH,
-  BOARD_HEIGHT,
 } from '../logic/Board';
 import Container, {ContainerStyleProps} from '../ui/Container';
 import Color from '../Color';
