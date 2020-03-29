@@ -20,6 +20,8 @@ class SingleplayerState extends State {
   private txtLines: Text;
   private cntLevel: Container;
   private txtLevel: Text;
+  private cntScore: Container;
+  private txtScore: Text;
 
   constructor() {
     super();
@@ -42,9 +44,18 @@ class SingleplayerState extends State {
       60,
     ).addChildren('lvlCount', this.txtLevel);
 
+    this.txtScore = new Text(0, 0, 'Score: 0').centerHorizontally().centerVertically();
+    this.cntScore = new Container(
+      boardXWidth + 10,
+      BOARD_Y + 160,
+      200,
+      60,
+    ).addChildren('scoreCount', this.txtScore);
+
     this.widgets = new WidgetManager()
       .addWidget('cntLines', this.cntLines)
-      .addWidget('cntLevel', this.cntLevel);
+      .addWidget('cntLevel', this.cntLevel)
+      .addWidget('cntScore', this.cntScore);
   }
 
   public static getInstance(): SingleplayerState {
@@ -60,6 +71,7 @@ class SingleplayerState extends State {
     this.widgets.update(delta);
     this.txtLines.text = `Lines: ${this.board.clearedLines.toString()}`;
     this.txtLevel.text = `Level: ${this.board.level.toString()}`;
+    this.txtScore.text = `Score: ${this.board.score.toString()}`;
   }
 
   public render(g: CanvasRenderingContext2D): void {

@@ -74,6 +74,7 @@ class Board {
   private lineCounter: number;
   public clearedLines: number;
   public level: number;
+  public score: number;
 
   constructor() {
     const emptyData: BlockData = {
@@ -100,6 +101,7 @@ class Board {
     this.gameOver = false;
     this.clearedLines = 0;
     this.lineCounter = 0;
+    this.score = 0;
   }
 
   private startGame(): void {
@@ -127,6 +129,20 @@ class Board {
     this.gameOver = false;
     this.clearedLines = 0;
     this.lineCounter = 0;
+    this.score = 0;
+  }
+
+  private calcLineClearScore(lineCount: number): number {
+    let base = 50;
+    if (lineCount === 2) {
+      base = 150;
+    } else if (lineCount === 3) {
+      base = 350;
+    } else if (lineCount === 4) {
+      base = 1000;
+    }
+
+    return base * (this.level + 1);
   }
 
   public update(delta: number): void {
@@ -266,6 +282,7 @@ class Board {
                         self.timers.newBlock.setResetTime(0);
                         self.clearedLines += linesY.length;
                         self.lineCounter += linesY.length;
+                        self.score += self.calcLineClearScore(linesY.length);
 
                         // level up
                         if (self.lineCounter >= 10) {
