@@ -16,7 +16,7 @@ interface BlockData {
 export const BOARD_WIDTH = 10;
 export const BOARD_HEIGHT = 20;
 const NEW_BLOCK_TIMER_DEFAULT = 280;
-const MOVE_BLOCK_TIMER_DEFAULT = 100;
+const MOVE_BLOCK_TIMER_DEFAULT = 80;
 
 function mapLevelToDropTimer(level: number): number {
   switch (level) {
@@ -66,9 +66,9 @@ class Board {
   private selectedBlock!: Block;
   private timers!: StrMap<Timer>;
   private shouldSpawnBlock!: boolean;
-  private initialMove!: boolean;
   private movingLeft!: boolean;
   private movingRight!: boolean;
+  private movementHoldTime!: number;
   private clearingLines!: boolean;
   private gameOver!: boolean;
   private lineCounter!: number;
@@ -102,9 +102,9 @@ class Board {
       moveBlock: new Timer(MOVE_BLOCK_TIMER_DEFAULT),
     };
     this.shouldSpawnBlock = false;
-    this.initialMove = false;
     this.movingLeft = false;
     this.movingRight = false;
+    this.movementHoldTime = 0;
     this.clearingLines = false;
     this.gameOver = false;
     this.clearedLines = 0;
@@ -305,20 +305,29 @@ class Board {
     }
 
     // selected block movement
-    if (this.timers.moveBlock.isActivated()) {
-      if (this.movingLeft) {
-        if (this.canMove(true)) {
-          this.selectedBlock.x--;
+    if (this.movementHoldTime >= 80) {
+      if (this.timers.moveBlock.isActivated()) {
+        if (this.movingLeft) {
+          if (this.canMove(true)) {
+            this.selectedBlock.x--;
+          }
+        } else if (this.movingRight) {
+          if (this.canMove(false)) {
+            this.selectedBlock.x++;
+          }
         }
-      } else if (this.movingRight) {
-        if (this.canMove(false)) {
-          this.selectedBlock.x++;
-        }
+  
+        this.timers.moveBlock.setResetTime(MOVE_BLOCK_TIMER_DEFAULT);
       }
-
-      this.timers.moveBlock.setResetTime(MOVE_BLOCK_TIMER_DEFAULT);
+  
+      this.timers.moveBlock.tick(delta);
     }
-    this.timers.moveBlock.tick(delta);
+
+    if (this.movingLeft || this.movingRight) {
+      this.movementHoldTime += delta;
+    } else {
+      this.movementHoldTime = 0;
+    }
 
     // check game over
     for (let x = 4; x <= 7; x++) {
@@ -337,27 +346,29 @@ class Board {
       this.movingLeft = true;
       this.movingRight = false;
 
-      if (this.initialMove) {
-        this.timers.moveBlock.setResetTime(0);
-        this.initialMove = false;
+      if (this.movementHoldTime < 80) {
+        if (this.canMove(true)) {
+          this.selectedBlock.x--;
+        }
       }
     } else if (InputHandler.isKeyDown(InputKey.RIGHT, e)) {
       this.movingLeft = false;
       this.movingRight = true;
 
-      if (this.initialMove) {
-        this.timers.moveBlock.setResetTime(0);
-        this.initialMove = false;
+      if (this.movementHoldTime < 80) {
+        if (this.canMove(false)) {
+          this.selectedBlock.x++;
+        }
       }
     }
 
     // end movement
     if (InputHandler.isKeyUp(InputKey.LEFT, e)) {
       this.movingLeft = false;
-      this.initialMove = true;
+      this.timers.moveBlock.reset();
     } else if (InputHandler.isKeyUp(InputKey.RIGHT, e)) {
       this.movingRight = false;
-      this.initialMove = true;
+      this.timers.moveBlock.reset();
     }
 
     // rotation
@@ -396,7 +407,6 @@ class Board {
           g.fillRect(x * 32 + BOARD_X, y * 32 + BOARD_Y, 32, 32);
         } else {
           g.strokeStyle = borderColor;
-          g.strokeRect(x * 32 + BOARD_X, y * 32 + BOARD_Y, 32, 32);
         }
       }
     }

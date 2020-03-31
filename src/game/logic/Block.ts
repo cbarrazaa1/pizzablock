@@ -177,6 +177,11 @@ class Block {
 
     this.color = mapBlockTypeToColor(this.type);
     this.shape = mapBlockTypeToShape(this.type);
+
+    // adjust long bar x
+    if (this.type === BlockType.I) {
+      this.x--;
+    }
   }
 
   rotateCW(): void {
