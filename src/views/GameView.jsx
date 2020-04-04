@@ -1,14 +1,15 @@
 import React from 'react';
 import Navigation from '../components/Navigation';
 import {colors} from '../constants';
+import GameContainer from '../game/GameContainer';
 
-function HomeView(props) {
+function GameView(props) {
     return (
         <div>
             <Navigation/>
-            <h1 className='mt-5 pt-5'>Home</h1>
+            <GameContainer/>
         </div>
     )
 }
 
-export default HomeView
+export default GameView

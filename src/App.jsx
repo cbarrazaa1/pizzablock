@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import './App.css';
 import {BrowserRouter} from 'react-router-dom';
-import MainRouter from './MainRouter';
-import { AuthContext } from './context/AuthContext';
+import MainRouter from './routing/MainRouter';
+import Auth from './context/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -18,9 +18,9 @@ function App() {
 	return (
 		<div className="App" style={styles.root}>
 			<BrowserRouter>
-				<AuthContext.Provider value={{authTokens, setAuthTokens: setTokens}}>
+				<Auth>
 					<MainRouter/>
-				</AuthContext.Provider>
+				</Auth>
 			</BrowserRouter>
 		</div>
 	);

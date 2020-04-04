@@ -1,10 +1,11 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {Link, Redirect} from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import CustomAlert from '../components/CustomAlert';
-import {useAuth} from '../context/AuthContext';
+import {AuthContext} from '../context/AuthContext';
+import {colors} from '../constants';
 
 function LoginView(props) {
 
@@ -15,16 +16,7 @@ function LoginView(props) {
     const [alertMessage, setAlertMessage] = useState('');
 	const [showAlert, setShowAlert] = useState(false);
 
-	const [isLoggedIn, setLoggedIn] = useState(false);
-	const [isError, setIsError] = useState(false);
-	
-	const {setAuthTokens, authTokens} = useAuth();
-
-	useEffect(() => {
-		if (authTokens) {
-			setLoggedIn(true);
-		}
-	}, [])
+	const { login } = useContext(AuthContext);
 	
 	const onCloseAlert = () => {
         setShowAlert(false);
@@ -40,14 +32,7 @@ function LoginView(props) {
 	
 	const postLogin = (e) => {
 		e.preventDefault();
-
-		setAuthTokens("hola");
-		setLoggedIn(true);
-
-	}
-
-	if (isLoggedIn) {
-		return <Redirect to='/game'/>
+		login();
 	}
 
   	return (
@@ -95,8 +80,8 @@ function LoginView(props) {
 
 const styles = {
 	primaryButton: {
-		backgroundColor: '#29e2ff',
-		color: 'white'
+		backgroundColor: colors.accent,
+		color: colors.light
 	},
 	loginCard: {
 		margin: 'auto',
@@ -108,7 +93,7 @@ const styles = {
 	loginTitle: {
 		marginTop: '170px',
 		marginBottom: '45px',
-		color: '#00a8c9',
+		color: colors.dark,
 		fontSize: '65px',
 	}
 }
