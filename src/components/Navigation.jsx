@@ -18,7 +18,7 @@ export default function Navigation (props) {
     return (
         <>
             <Navbar bg="flat" variant="dark" style={styles.mainNavbar} expand="lg" fixed='top'>
-                <Navbar.Brand href='/'>PizzaBlock</Navbar.Brand>
+                <Navbar.Brand onClick={() => history.push('/')}>PizzaBlock</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="justify-content-end mr-auto" >
