@@ -40,6 +40,37 @@ class OtherBoard {
       }
     }
   }
+
+  public shiftBlocks(clearedLines: number[]): void {
+    let sequentialClear = true;
+
+    // check if lines were cleared sequentially
+    if (clearedLines.length === 2) {
+      if (clearedLines[1] - clearedLines[0] !== 1) {
+        sequentialClear = false;
+      }
+    }
+
+    // shift blocks down
+    const shiftBlocks = (
+      clearY: number,
+      shiftCount: number,
+    ): void => {
+      for (let y = clearY - 1; y >= 0; y--) {
+        for (let x = 0; x < BOARD_WIDTH; x++) {
+          this.mat[x][y + shiftCount] = {...this.mat[x][y]};
+          this.mat[x][y].value = 0;
+        }
+      }
+    };
+
+    if (sequentialClear) {
+      shiftBlocks(clearedLines[0], clearedLines.length);
+    } else {
+      shiftBlocks(clearedLines[0], 1);
+      shiftBlocks(clearedLines[1], 1);
+    }
+  }
 }
 
 export default OtherBoard;

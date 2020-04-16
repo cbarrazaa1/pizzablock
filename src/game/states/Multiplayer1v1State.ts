@@ -160,9 +160,10 @@ class Multiplayer1v1State extends State {
   }
 
   private handlePlayerPlaceBlock(packet: PlayerPlaceBlockPacket): void {
-    const block = packet.data.block;
+    const {block, clearedLines} = packet.data;
     console.log(packet.data);
 
+    // update board
     for (let i = 0; i < block.data.length; i++) {
       for (let j = 0; j < block.data[0].length; j++) {
         if (block.data[i][j] === 1) {
@@ -172,6 +173,11 @@ class Multiplayer1v1State extends State {
           }
         }
       }
+    }
+
+    // clear lines
+    if (clearedLines.length > 0) {
+      this.otherBoard.shiftBlocks(clearedLines);
     }
   }
 }

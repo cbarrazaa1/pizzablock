@@ -66,9 +66,10 @@ type PlayerPlaceBlockData = {
     readonly data: number[][];
     readonly type: number;
   },
-  level: number;
-  score: number;
-  lines: number;
+  readonly level: number;
+  readonly score: number;
+  readonly lines: number;
+  readonly clearedLines: number[];
 };
 
 export class PlayerPlaceBlockPacket extends Packet {
