@@ -46,14 +46,26 @@ class Container extends Widget {
   }
 
   public update(delta: number): void {
+    if (!this.visible) {
+      return;
+    }
+
     Object.values(this.children).forEach(child => child.update(delta));
   }
 
   public input(e: InputEvent): void {
+    if (!this.visible) {
+      return;
+    }
+
     Object.values(this.children).forEach(child => child.input(e));
   }
 
   public render(g: CanvasRenderingContext2D): void {
+    if (!this.visible) {
+      return;
+    }
+    
     const style = this.style as ContainerStyleProps;
     g.fillStyle = style.backgroundColor!.toString();
     g.lineJoin = 'round';

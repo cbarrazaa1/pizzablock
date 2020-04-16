@@ -23,7 +23,7 @@ export type RotationSimulationResult = {
   };
 };
 
-function mapBlockTypeToColor(type: BlockType): Color {
+export function mapBlockTypeToColor(type: BlockType): Color {
   switch (type) {
     case BlockType.I:
       return Color.CYAN.copy();
@@ -162,7 +162,7 @@ class Block {
   public x: number;
   public y: number;
   public shape: BlockShape;
-  private type: BlockType;
+  public type: BlockType;
 
   constructor(x: number, y: number, randomize: boolean = true) {
     this.rotation = 0;

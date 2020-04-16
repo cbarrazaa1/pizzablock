@@ -100,7 +100,7 @@ class SingleplayerState extends State {
       'board',
       new CustomWidget()
         .onInit((_): void => {
-          this.board = new Board(this.cntBoard);
+          this.board = new Board(this.cntBoard, 32);
         })
         .onUpdate((_, delta: number): void => {
           this.board.update(delta);

@@ -8,6 +8,7 @@ export enum InputKey {
   Z = 'z',
   X = 'x',
   ENTER = 'Enter',
+  SPACE = ' ',
 }
 
 export enum InputButton {

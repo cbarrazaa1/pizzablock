@@ -44,11 +44,23 @@ class Text extends Widget {
     return this;
   }
 
-  public update(delta: number): void {}
+  public update(delta: number): void {
+    if (!this.visible) {
+      return;
+    }
+  }
 
-  public input(e: InputEvent): void {}
+  public input(e: InputEvent): void {
+    if (!this.visible) {
+      return;
+    }
+  }
 
   public render(g: CanvasRenderingContext2D): void {
+    if (!this.visible) {
+      return;
+    }
+    
     const style = this.style as TextStyleProps;
 
     g.font = this.formatFont();
