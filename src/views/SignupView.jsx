@@ -4,7 +4,8 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import CustomAlert from '../components/CustomAlert';
-import {colors} from '../constants';
+import colors from '../constants/colors';
+import globalStyles from '../constants/styles';
 
 function SignupView({history}) {
 
@@ -89,7 +90,7 @@ function SignupView({history}) {
                         variant="flat" 
                         bg='flat' 
                         type="submit"
-                        style={styles.primaryButton}
+                        style={globalStyles.primaryButton}
                     >
                         Submit
                     </Button>
@@ -101,10 +102,6 @@ function SignupView({history}) {
 }
 
 const styles = {
-	primaryButton: {
-		backgroundColor: colors.accent,
-		color: colors.light
-	},
 	loginCard: {
 		margin: 'auto',
 		width: '500px'

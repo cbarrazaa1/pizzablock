@@ -7,28 +7,48 @@ export default function Auth({ children }) {
 
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
+    const [user, setUser] = useState({})
 
     useEffect(() => {
+        console.log("Checking token")
         checkAuth()
     }, [])
 
-    const checkAuth = () => checkIsAuthenticated()
-        .then((result) => setIsAuthenticated(result))
-        .catch(() => setIsAuthenticated(false))
-        .then(() => setIsLoading(false))
+    const checkAuth = () => {
+        setIsLoading(true);
+        return checkIsAuthenticated()
+            .then((result) => {
+                setIsLoading(false);
+                if (result.success) {
+                    setUser({id: result.id, name: result.name})
+                    setIsAuthenticated(true);
+                } else {
+                    setIsAuthenticated(false);
+                    return false;
+                }
+            })
+            .catch(() => {
+                setIsAuthenticated(false)
+                setIsLoading(false);
+            })
+    }
         
 
     const login = credentials => {
-        setIsLoading(true);
-        authLogin(credentials)
+        return authLogin(credentials)
             .then((result) => {
-                setIsAuthenticated(result);
-                setIsLoading(false);
+                if (result.success) {
+                    setUser({id: result.id, name: result.name});
+                    setIsAuthenticated(true);
+                    return true;
+                } else {
+                    setIsAuthenticated(false);
+                    return false;
+                }
             })
             .catch(error => {
-                alert(error)
                 setIsAuthenticated(false)
-                setIsLoading(false);
+                return false;
             })
     }
 
@@ -38,21 +58,18 @@ export default function Auth({ children }) {
     }
 
     const signUp = credentials => {
-        setIsLoading(true);    
-        authSignUp(credentials)
+        return authSignUp(credentials)
             .then((result) => {
-                setIsAuthenticated(result)
-                setIsLoading(false);
+                return result.success
             })
             .catch(error => {
-                alert(error)
+                alert(error);
                 setIsAuthenticated(false)
-                setIsLoading(false);
             })
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout, signUp }}>
+        <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout, signUp, checkAuth, user }}>
             {children}
         </AuthContext.Provider>
     )

@@ -1,11 +1,12 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {Link, Redirect} from 'react-router-dom';
+import {Link, Redirect, useHistory} from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import CustomAlert from '../components/CustomAlert';
 import {AuthContext} from '../context/AuthContext';
-import {colors} from '../constants';
+import colors from '../constants/colors';
+import globalStyles from '../constants/styles';
 
 function LoginView(props) {
 
@@ -17,6 +18,7 @@ function LoginView(props) {
 	const [showAlert, setShowAlert] = useState(false);
 
 	const { login } = useContext(AuthContext);
+	const history = useHistory();
 	
 	const onCloseAlert = () => {
         setShowAlert(false);
@@ -32,7 +34,19 @@ function LoginView(props) {
 	
 	const postLogin = (e) => {
 		e.preventDefault();
-		login();
+		login({email, password})
+			.then(result => {
+				if (result) {
+					history.push('/');
+				} else {
+					throw Error
+				}
+			})
+			.catch(error => {
+				setAlertVariant('danger');
+				setAlertMessage('Login error');
+				setShowAlert(true);
+			})
 	}
 
   	return (
@@ -67,7 +81,7 @@ function LoginView(props) {
 						variant="flat" 
 						bg='flat' 
 						type="submit"
-						style={styles.primaryButton}
+						style={globalStyles.primaryButton}
 					>
 						Submit
 					</Button>
@@ -79,10 +93,6 @@ function LoginView(props) {
 }
 
 const styles = {
-	primaryButton: {
-		backgroundColor: colors.accent,
-		color: colors.light
-	},
 	loginCard: {
 		margin: 'auto',
 		width: '500px'

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import Navigation from '../components/Navigation';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import globalStyles from '../constants/styles';
@@ -9,7 +9,7 @@ function HomeView(props) {
     const [games, setGames] = useState([
         {
             name: "1v1",
-            description: "Play against a single opponent to win a pizza.",
+            description: "Play against a single opponent to win a pizza",
             image: "https://cdn.pomu.com/files/game/img_mobile/15644/Tetris-Cube_.webp"
         },
         {
@@ -18,20 +18,15 @@ function HomeView(props) {
             image: "https://www.lifewire.com/thmb/lOcp49hO-GvkFM7JgrwZjRpZC_8=/1920x1080/filters:fill(auto,1)/how-to-play-tetris-99-on-nintendo-switch-featured-7af5d3957deb44f4a8d4c812d88946ce.jpg"
         },
         {
-            name: "1v99",
-            description: "Play against the world to win a pizza",
-            image: "https://cdn02.nintendo-europe.com/media/images/10_share_images/games_15/nintendo_switch_download_software_1/H2x1_NSwitchDS_Tetris99_image1600w.jpg"
+            name: "One4All",
+            description: "Play against a 4 opponents opponent to win a pizza",
+            image: "https://cdn.pomu.com/files/game/img_mobile/15644/Tetris-Cube_.webp"
         }
     ])
 
-    const history = useHistory();
-
-    const onClickPlay = (e) => {
-        history.push('/play');
-    }
-
     return (
         <div>
+            <Navigation />
             <h1 className='text-center my-5 pt-5'>Game modes</h1>
             <div style={styles.groupContainer}>
                 {games.map((game, i) => {
@@ -43,14 +38,7 @@ function HomeView(props) {
                                 <Card.Text>
                                     {game.description}
                                 </Card.Text>
-                                <Button
-                                    variant="flat"
-                                    bg="flat"
-                                    style={globalStyles.primaryButton}
-                                    onClick={onClickPlay}
-                                >
-                                    Play
-                                </Button>
+                                <Button variant="flat" bg="flat" style={globalStyles.primaryButton}>Play</Button>
                             </Card.Body>
                         </Card>
                     )

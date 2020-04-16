@@ -1,28 +1,35 @@
 import React, { useContext } from 'react'
 import { Route, Redirect } from 'react-router-dom'
-import { AuthContext } from '../context/AuthContext'
+import { AuthContext } from '../context/AuthContext';
+import Container from 'react-bootstrap/Container';
+import Navigation from '../components/Navigation';
 
 function PrivateRoute({ component: Component, ...otherProps }) {
 
     const { isAuthenticated, isLoading } = useContext(AuthContext)
 
     return (
-        <Route
-            {...otherProps}
-            render={props => (
-                !isLoading
-                    ?
-                    (
-                        isAuthenticated
+        <div>
+            <Navigation />
+            <Container>
+                <Route
+                    {...otherProps}
+                    render={props => (
+                        !isLoading
                             ?
-                            <Component {...props} />
+                            (
+                                isAuthenticated
+                                    ?
+                                    <Component {...props} />
+                                    :
+                                    <Redirect to={'/login'} />
+                            )
                             :
-                            <Redirect to={'/login'} />
-                    )
-                    :
-                    <h1>Cargando...</h1>
-            )}
-        />
+                            <h1>Cargando...</h1>
+                    )}
+                />
+            </Container>
+        </div>
     )
 
 }
