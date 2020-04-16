@@ -1,6 +1,7 @@
 import State from './states/State';
 import {InputEvent} from './InputHandler';
 import SingleplayerState from './states/SingleplayerState';
+import Multiplayer1v1State from './states/Multiplayer1v1State';
 
 export const Screen = {
   width: 1080,
@@ -13,7 +14,7 @@ class Game {
 
   constructor(g: CanvasRenderingContext2D) {
     this.g = g;
-    this.currentState = SingleplayerState.getInstance();
+    this.currentState = Multiplayer1v1State.getInstance();
   }
 
   public update(delta: number): void {

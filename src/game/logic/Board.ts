@@ -1,5 +1,5 @@
 import Color from '../Color';
-import Block from './Block';
+import Block, {BlockType} from './Block';
 import InputHandler, {InputEvent, InputKey} from '../InputHandler';
 import {StrMap} from '../../util/Types';
 import Timer from '../Timer';
@@ -8,7 +8,7 @@ import Widget from '../ui/Widget';
 
 const TWEEN = require('@tweenjs/tween.js').default;
 
-interface BlockData {
+export interface BlockData {
   value: number;
   color: Color;
 }
@@ -61,6 +61,15 @@ function mapLevelToDropTimer(level: number): number {
   return 16;
 }
 
+export type PlaceBlockCallbackData = {
+  x: number;
+  y: number;
+  data: number[][];
+  type: BlockType;
+};
+
+export type PlaceBlockCallback = (block: PlaceBlockCallbackData) => void;
+
 class Board {
   private mat!: BlockData[][];
   private selectedBlock!: Block;
@@ -73,13 +82,16 @@ class Board {
   private gameOver!: boolean;
   private lineCounter!: number;
   private parent: Widget;
+  private blockSize: number;
   public clearedLines!: number;
   public level!: number;
   public score!: number;
   public nextBlock!: Block;
+  public onPlaceBlock?: PlaceBlockCallback;
 
-  constructor(parent: Widget) {
+  constructor(parent: Widget, blockSize: number) {
     this.parent = parent;
+    this.blockSize = blockSize;
     this.startGame();
   }
 
@@ -141,6 +153,15 @@ class Board {
         if (y + shapeHeight + 1 > BOARD_HEIGHT) {
           shouldFall = false;
 
+          if (this.onPlaceBlock != null) {
+            this.onPlaceBlock({
+              x,
+              y,
+              data: _.cloneDeep(shape.rotations[rotation]),
+              type: this.selectedBlock.type,
+            });
+          }
+
           for (let i = 0; i < shapeWidth; i++) {
             for (let j = 0; j < shapeHeight; j++) {
               if (shape.rotations[rotation][j][i] === 1) {
@@ -167,6 +188,16 @@ class Board {
                 shape.rotations[rotation][j][i] === 1 &&
                 this.mat[x + i][y + j + 1].value === 1
               ) {
+
+                if (this.onPlaceBlock != null) {
+                  this.onPlaceBlock({
+                    x,
+                    y,
+                    data: _.cloneDeep(shape.rotations[rotation]),
+                    type: this.selectedBlock.type,
+                  });
+                }
+                
                 for (let ii = 0; ii < shapeWidth; ii++) {
                   for (let jj = 0; jj < shapeHeight; jj++) {
                     if (shape.rotations[rotation][jj][ii] === 1) {
@@ -248,7 +279,7 @@ class Board {
 
                 // delete line
                 for (let xx = 0; xx < BOARD_WIDTH; xx++) {
-                  (function(xx, self) {
+                  (function (xx, self) {
                     new TWEEN.Tween({
                       alpha: self.mat[xx][y].color.a,
                     })
@@ -316,10 +347,10 @@ class Board {
             this.selectedBlock.x++;
           }
         }
-  
+
         this.timers.moveBlock.setResetTime(MOVE_BLOCK_TIMER_DEFAULT);
       }
-  
+
       this.timers.moveBlock.tick(delta);
     }
 
@@ -394,17 +425,27 @@ class Board {
     const borderColor = new Color(80, 80, 80, 255).toString();
     const BOARD_X = this.parent.getRealX();
     const BOARD_Y = this.parent.getRealY();
-    
+
     g.strokeStyle = borderColor;
     g.lineWidth = 1;
-    g.strokeRect(BOARD_X, BOARD_Y, BOARD_WIDTH * 32, BOARD_HEIGHT * 32);
+    g.strokeRect(
+      BOARD_X,
+      BOARD_Y,
+      BOARD_WIDTH * this.blockSize,
+      BOARD_HEIGHT * this.blockSize,
+    );
 
     // render board
     for (let x = 0; x < BOARD_WIDTH; x++) {
       for (let y = 0; y < BOARD_HEIGHT; y++) {
         if (this.mat[x][y].value === 1) {
           g.fillStyle = this.mat[x][y].color.toString();
-          g.fillRect(x * 32 + BOARD_X, y * 32 + BOARD_Y, 32, 32);
+          g.fillRect(
+            x * this.blockSize + BOARD_X,
+            y * this.blockSize + BOARD_Y,
+            this.blockSize,
+            this.blockSize,
+          );
         } else {
           g.strokeStyle = borderColor;
         }
@@ -420,7 +461,12 @@ class Board {
       for (let j = 0; j < shapeHeight; j++) {
         if (shape.rotations[rotation][j][i] === 1) {
           g.fillStyle = color.toString();
-          g.fillRect((x + i) * 32 + BOARD_X, (y + j) * 32 + BOARD_Y, 32, 32);
+          g.fillRect(
+            (x + i) * this.blockSize + BOARD_X,
+            (y + j) * this.blockSize + BOARD_Y,
+            this.blockSize,
+            this.blockSize,
+          );
         }
       }
     }
@@ -484,10 +530,10 @@ class Board {
           shadowColor.a = 100;
           g.fillStyle = shadowColor.toString();
           g.fillRect(
-            (x + i) * 32 + BOARD_X,
-            (shadowY + j) * 32 + BOARD_Y,
-            32,
-            32,
+            (x + i) * this.blockSize + BOARD_X,
+            (shadowY + j) * this.blockSize + BOARD_Y,
+            this.blockSize,
+            this.blockSize,
           );
         }
       }
@@ -495,8 +541,8 @@ class Board {
 
     // render game over
     if (this.gameOver) {
-      const width = BOARD_WIDTH * 32;
-      const height = BOARD_HEIGHT * 32;
+      const width = BOARD_WIDTH * this.blockSize;
+      const height = BOARD_HEIGHT * this.blockSize;
 
       g.fillStyle = 'rgba(0, 0, 0, 0.6)';
       g.fillRect(BOARD_X - 1, BOARD_Y - 1, width + 2, height + 2);

@@ -8,6 +8,7 @@ abstract class Widget {
   public y: number;
   public width: number;
   public height: number;
+  public visible: boolean;
   public parent: Nullable<Widget>;
   protected style: StyleProps;
 
@@ -16,12 +17,18 @@ abstract class Widget {
     this.y = y;
     this.width = width;
     this.height = height;
+    this.visible = true;
     this.parent = null;
     this.style = {};
   }
 
   public setStyle(style: StyleProps): Widget {
     this.style = {...this.style, ...style};
+    return this;
+  }
+
+  public setVisible(visible: boolean): Widget {
+    this.visible = visible;
     return this;
   }
 

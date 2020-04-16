@@ -42,14 +42,26 @@ class CustomWidget extends Widget {
   }
 
   public update(delta: number): void {
+    if (!this.visible) {
+      return;
+    }
+
     this.updateFunc(this, delta);
   }
 
   public input(e: InputEvent): void {
+    if (!this.visible) {
+      return;
+    }
+
     this.inputFunc(this, e);
   }
 
   public render(g: CanvasRenderingContext2D): void {
+    if (!this.visible) {
+      return;
+    }
+    
     this.renderFunc(this, g);
   }
 }
