@@ -89,13 +89,13 @@ class Board {
   public nextBlock!: Block;
   public onPlaceBlock?: PlaceBlockCallback;
 
-  constructor(parent: Widget, blockSize: number) {
+  constructor(parent: Widget, blockSize: number, initialLevel?: number) {
     this.parent = parent;
     this.blockSize = blockSize;
-    this.startGame();
+    this.startGame(initialLevel);
   }
 
-  private startGame(): void {
+  private startGame(initialLevel?: number): void {
     const emptyData: BlockData = {
       value: 0,
       color: Color.RED,
@@ -107,7 +107,13 @@ class Board {
 
     this.selectedBlock = new Block(4, 0);
     this.nextBlock = new Block(4, 0);
-    this.level = 9;
+    
+    if (initialLevel != null) {
+      this.level = initialLevel;
+    } else {
+      this.level = 9;
+    }
+
     this.timers = {
       drop: new Timer(mapLevelToDropTimer(this.level)),
       newBlock: new Timer(NEW_BLOCK_TIMER_DEFAULT),

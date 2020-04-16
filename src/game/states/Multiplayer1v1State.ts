@@ -3,7 +3,7 @@ import InputHandler, {InputEvent, InputKey} from '../InputHandler';
 import State from './State';
 import io from 'socket.io-client';
 import Client from '../network/Client';
-import {Packet, PacketType} from '../network/Packets';
+import {PacketType, PlaceBlockPacket, EnterQueuePacket, EnterGamePacket, PlayerPlaceBlockPacket} from '../network/Packets';
 import Container from '../ui/Container';
 import {Screen} from '../Game';
 import WidgetManager from '../ui/WidgetManager';
@@ -58,10 +58,6 @@ class Multiplayer1v1State extends State {
     this.cntBoard.addChild(
       'board',
       new CustomWidget()
-        .onInit((): void => {
-          this.board = new Board(this.cntBoard, 32);
-          this.board.onPlaceBlock = this.sendPlaceBlock.bind(this);
-        })
         .onUpdate((_, delta: number): void => {
           this.board.update(delta);
         })
@@ -129,20 +125,18 @@ class Multiplayer1v1State extends State {
     this.widgets.input(e);
   }
 
+  private initBoard(initialLevel: number): void {
+    this.board = new Board(this.cntBoard, 32, initialLevel);
+    this.board.level = initialLevel;
+    this.board.onPlaceBlock = this.sendPlaceBlock.bind(this);
+  }
+
   private sendEnterQueue(): void {
-    this.client.sendData({
-      type: PacketType.C_1V1_ENTER_QUEUE,
-      data: {},
-    });
+    this.client.sendData(new EnterQueuePacket());
   }
 
   private sendPlaceBlock(block: PlaceBlockCallbackData): void {
-    this.client.sendData({
-      type: PacketType.C_1v1_PLACE_BLOCK,
-      data: {
-        block,
-      }
-    });
+    this.client.sendData(new PlaceBlockPacket({...block}))
   }
 
   private initNetworkHandlers(): void {
@@ -157,16 +151,17 @@ class Multiplayer1v1State extends State {
     );
   }
 
-  private handleEnterGame(packet: Packet): void {
-    const otherID = packet.data['otherID'] as string;
+  private handleEnterGame(packet: EnterGamePacket): void {
+    const {otherID, initialLevel} = packet.data;
     this.internalState = InternalState.IN_GAME;
+    this.initBoard(initialLevel);
     this.cntMenu.setVisible(false);
     this.cntGame.setVisible(true);
   }
 
-  private handlePlayerPlaceBlock(packet: Packet): void {
-    const block = packet.data['block'] as PlaceBlockCallbackData;
-    console.log(block);
+  private handlePlayerPlaceBlock(packet: PlayerPlaceBlockPacket): void {
+    const block = packet.data.block;
+    console.log(packet.data);
 
     for (let i = 0; i < block.data.length; i++) {
       for (let j = 0; j < block.data[0].length; j++) {
