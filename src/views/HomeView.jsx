@@ -32,11 +32,11 @@ function HomeView(props) {
 
     return (
         <div>
-            <h1 className='text-center my-5 pt-5'>Game modes</h1>
+            <h1 className='text-center mb-5'>Game modes</h1>
             <div style={styles.groupContainer}>
                 {games.map((game, i) => {
                     return (
-                        <Card style={styles.groupCard}>
+                        <Card style={styles.groupCard} className={"hvr-grow-shadow"}>
                             <Card.Img style={styles.thumbnail} variant="top" src={game.image} />
                             <Card.Body>
                                 <Card.Title>{game.name}</Card.Title>

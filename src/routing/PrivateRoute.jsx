@@ -11,7 +11,7 @@ function PrivateRoute({ component: Component, ...otherProps }) {
     return (
         <div>
             <Navigation />
-            <Container>
+            <Container className='mt-5 pt-5'>
                 <Route
                     {...otherProps}
                     render={props => (

@@ -6,6 +6,7 @@ import SignupView from '../views/SignupView';
 import HomeView from '../views/HomeView';
 import NonAuthRoute from './NonAuthRoute';
 import GameView from '../views/GameView';
+import ProfileView from '../views/ProfleView';
 
 function MainRouter() {
     return (
@@ -13,6 +14,7 @@ function MainRouter() {
             <Switch>
                 <PrivateRoute exact path="/" component={HomeView}/>
                 <PrivateRoute path="/play" component={GameView}/>
+                <PrivateRoute path="/profile" component={ProfileView}/>
                 <NonAuthRoute path="/login" component={LoginView}/>
                 <NonAuthRoute path="/signup" component={SignupView}/>
             </Switch>
