@@ -41,7 +41,7 @@ class Multiplayer1v1State extends State {
     this.internalState = InternalState.NONE;
 
     // setup client socket
-    this.client = new Client(io('http://localhost:4000'));
+    this.client = new Client(io('https://pizzablock-server.herokuapp.com/'));
     this.initNetworkHandlers();
 
     // setup interface
