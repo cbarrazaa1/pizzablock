@@ -1,20 +1,23 @@
 import Widget from '../Widget';
-import Container from '../Container';
 import Block from '../../logic/Block';
 import {InputEvent} from '../../InputHandler';
+import { Nullable } from '../../../util/Types';
 
 class NextBlockComponent extends Widget {
-  private block: Block;
+  private block: Nullable<Block>;
   private blockSize: number;
 
-  constructor(block: Block, blockSize: number) {
+  constructor(blockSize: number) {
     super(0, 0, 0, 0);
-    this.block = block;
+    this.block = null;
     this.blockSize = blockSize;
-
+  }
+  
+  public setBlock(block: Block): void {
+    this.block = block;
     const {shape, rotation} = this.block;
-    this.width = shape.rotations[rotation][0].length * blockSize;
-    this.height = shape.rotations[rotation].length * blockSize;
+    this.width = shape.rotations[rotation][0].length * this.blockSize;
+    this.height = shape.rotations[rotation].length * this.blockSize;
   }
 
   public input(_: InputEvent): void {}
@@ -22,6 +25,10 @@ class NextBlockComponent extends Widget {
   public update(_: number): void {}
 
   public render(g: CanvasRenderingContext2D): void {
+    if (this.block == null) {
+      return;
+    }
+
     const {shape, rotation, color} = this.block;
     const shapeWidth = shape.rotations[rotation][0].length;
     const shapeHeight = shape.rotations[rotation].length;
@@ -38,8 +45,7 @@ class NextBlockComponent extends Widget {
               this.parent!.width / 2 -
               this.width / 2 +
               i * this.blockSize,
-            this.getRealY() -
-              10 +
+            this.getRealY() +
               this.parent!.height / 2 -
               this.height / 2 +
               j * this.blockSize,

@@ -1,14 +1,20 @@
-import Text, { TextStyleProps } from "../Text";
-import Container from "../Container";
-import Color from "../../Color";
+import Text, {TextStyleProps} from '../Text';
+import Container from '../Container';
+import Color from '../../Color';
 
 class CounterComponent extends Container {
   private txtCounter: Text;
   private label: string;
 
-  constructor(x: number, y: number, width: number, height: number) {
+  constructor(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    label: string,
+  ) {
     super(x, y, width, height);
-    this.label = '';
+    this.label = label;
     this.txtCounter = new Text(0, 0, `${this.label}: 0`)
       .centerHorizontally()
       .centerVertically();
@@ -22,11 +28,6 @@ class CounterComponent extends Container {
 
   public setCounter(counter: number): CounterComponent {
     this.txtCounter.text = `${this.label}: ${counter}`;
-    return this;
-  }
-  
-  public setLabel(label: string): CounterComponent {
-    this.label = label;
     return this;
   }
 

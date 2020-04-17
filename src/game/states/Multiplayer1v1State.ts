@@ -3,7 +3,13 @@ import InputHandler, {InputEvent, InputKey} from '../InputHandler';
 import State from './State';
 import io from 'socket.io-client';
 import Client from '../network/Client';
-import {PacketType, PlaceBlockPacket, EnterQueuePacket, EnterGamePacket, PlayerPlaceBlockPacket} from '../network/Packets';
+import {
+  PacketType,
+  PlaceBlockPacket,
+  EnterQueuePacket,
+  EnterGamePacket,
+  PlayerPlaceBlockPacket,
+} from '../network/Packets';
 import Container from '../ui/Container';
 import {Screen} from '../Game';
 import WidgetManager from '../ui/WidgetManager';
@@ -11,7 +17,11 @@ import Text from '../ui/Text';
 import CounterComponent from '../ui/custom/CounterComponent';
 import NextBlockComponent from '../ui/custom/NextBlockComponent';
 import Block from '../logic/Block';
-import Board, {BOARD_WIDTH, BOARD_HEIGHT, PlaceBlockCallbackData} from '../logic/Board';
+import Board, {
+  BOARD_WIDTH,
+  BOARD_HEIGHT,
+  PlaceBlockCallbackData,
+} from '../logic/Board';
 import CustomWidget from '../ui/CustomWidget';
 import OtherBoard from '../logic/OtherBoard';
 import {mapBlockTypeToColor} from '../logic/Block';
@@ -33,7 +43,19 @@ class Multiplayer1v1State extends State {
   private txtStatus: Text;
   private cntMenu: Container;
   private cntBoard: Container;
+  private cntMyField: Container;
+  private txtMyName: Text;
+  private myScore: CounterComponent;
+  private myLines: CounterComponent;
+  private myLevel: CounterComponent;
+  private cntNextBlock: Container;
+  private nextBlock: NextBlockComponent;
   private cntOtherBoard: Container;
+  private cntOtherField: Container;
+  private txtOtherName: Text;
+  private otherScore: CounterComponent;
+  private otherLines: CounterComponent;
+  private otherLevel: CounterComponent;
   private cntGame: Container;
 
   constructor() {
@@ -53,7 +75,41 @@ class Multiplayer1v1State extends State {
       .addChild('txtStatus', this.txtStatus)
       .setStyle({borderWidth: 0});
 
-    this.cntBoard = new Container(10, 10, BOARD_WIDTH * 32, BOARD_HEIGHT * 32);
+    this.txtMyName = new Text(0, 10, 'Me').centerHorizontally();
+
+    this.myLines = new CounterComponent(
+      BOARD_WIDTH * 32 + 20,
+      40,
+      140,
+      50,
+      'Lines',
+    ).setTextStyle({fontSize: 16});
+
+    this.myLevel = new CounterComponent(
+      this.myLines.x,
+      this.myLines.y + this.myLines.height + 10,
+      140,
+      50,
+      'Level',
+    ).setTextStyle({fontSize: 16});
+
+    this.myScore = new CounterComponent(
+      this.myLines.x,
+      this.myLevel.y + this.myLevel.height + 10,
+      140,
+      50,
+      'Score',
+    ).setTextStyle({fontSize: 16});
+
+    this.nextBlock = new NextBlockComponent(32);
+    this.cntNextBlock = new Container(
+      this.myScore.x,
+      this.myScore.y + this.myScore.height + 10,
+      140,
+      140,
+    ).addChild('nextBlock', this.nextBlock);
+
+    this.cntBoard = new Container(10, 40, BOARD_WIDTH * 32, BOARD_HEIGHT * 32);
 
     this.cntBoard.addChild(
       'board',
@@ -69,9 +125,48 @@ class Multiplayer1v1State extends State {
         }),
     );
 
-    this.cntOtherBoard = new Container(
-      BOARD_WIDTH * 32 + 20,
+    this.cntMyField = new Container(
       10,
+      0,
+      BOARD_WIDTH * 32 + this.myLines.width + 30,
+      BOARD_HEIGHT * 32 + 50,
+    )
+      .addChild('txtMyName', this.txtMyName)
+      .addChild('board', this.cntBoard)
+      .addChild('myLines', this.myLines)
+      .addChild('myLevel', this.myLevel)
+      .addChild('myScore', this.myScore)
+      .addChild('cntNextBlock', this.cntNextBlock);
+
+    this.txtOtherName = new Text(0, 10, 'Other').centerHorizontally();
+
+    this.otherLines = new CounterComponent(
+      10,
+      40,
+      140,
+      50,
+      'Lines',
+    ).setTextStyle({fontSize: 16});
+
+    this.otherLevel = new CounterComponent(
+      this.otherLines.x,
+      this.otherLines.y + this.otherLines.height + 10,
+      140,
+      50,
+      'Level',
+    ).setTextStyle({fontSize: 16});
+
+    this.otherScore = new CounterComponent(
+      this.otherLines.x,
+      this.otherLevel.y + this.otherLevel.height + 10,
+      140,
+      50,
+      'Score',
+    ).setTextStyle({fontSize: 16});
+
+    this.cntOtherBoard = new Container(
+      this.otherLines.x + this.otherLines.width + 10,
+      40,
       BOARD_WIDTH * 32,
       BOARD_HEIGHT * 32,
     );
@@ -87,9 +182,28 @@ class Multiplayer1v1State extends State {
         }),
     );
 
-    this.cntGame = new Container(0, 0, Screen.width, Screen.height)
-      .addChild('cntBoard', this.cntBoard)
-      .addChild('cntOtherBoard', this.cntOtherBoard);
+    this.cntOtherField = new Container(
+      this.cntMyField.width + 40,
+      0,
+      BOARD_WIDTH * 32 + this.otherLines.width + 30,
+      BOARD_HEIGHT * 32 + 50,
+    )
+      .addChild('txtOtherName', this.txtOtherName)
+      .addChild('otherBoard', this.cntOtherBoard)
+      .addChild('otherLines', this.otherLines)
+      .addChild('otherLevel', this.otherLevel)
+      .addChild('otherScore', this.otherScore);
+
+    const gameWidth = this.cntMyField.width + this.cntOtherField.width + 40;
+    const gameHeight = this.cntMyField.height;
+    const gameX = Screen.width / 2 - gameWidth / 2;
+    const gameY = Screen.height / 2 - gameHeight / 2;
+
+    this.cntGame = new Container(gameX, gameY, gameWidth, gameHeight)
+      .setStyle({borderWidth: 0})
+      .addChild('cntMyField', this.cntMyField)
+      .addChild('cntOtherField', this.cntOtherField);
+
     this.cntGame.setVisible(false);
 
     this.widgets = new WidgetManager()
@@ -107,6 +221,14 @@ class Multiplayer1v1State extends State {
 
   public update(delta: number): void {
     this.widgets.update(delta);
+
+    // update my board
+    if (this.board != null) {
+      this.myLines.setCounter(this.board.clearedLines);
+      this.myLevel.setCounter(this.board.level);
+      this.myScore.setCounter(this.board.score);
+      this.nextBlock.setBlock(this.board.nextBlock);
+    }
   }
 
   public render(g: CanvasRenderingContext2D): void {
@@ -136,7 +258,7 @@ class Multiplayer1v1State extends State {
   }
 
   private sendPlaceBlock(block: PlaceBlockCallbackData): void {
-    this.client.sendData(new PlaceBlockPacket({...block}))
+    this.client.sendData(new PlaceBlockPacket({...block}));
   }
 
   private initNetworkHandlers(): void {
@@ -160,7 +282,7 @@ class Multiplayer1v1State extends State {
   }
 
   private handlePlayerPlaceBlock(packet: PlayerPlaceBlockPacket): void {
-    const {block, clearedLines} = packet.data;
+    const {block, clearedLines, lines, level, score} = packet.data;
     console.log(packet.data);
 
     // update board
@@ -169,8 +291,8 @@ class Multiplayer1v1State extends State {
         if (block.data[i][j] === 1) {
           this.otherBoard.mat[block.x + j][block.y + i] = {
             color: mapBlockTypeToColor(block.type),
-            value: 1,   
-          }
+            value: 1,
+          };
         }
       }
     }
@@ -179,7 +301,13 @@ class Multiplayer1v1State extends State {
     if (clearedLines.length > 0) {
       this.otherBoard.shiftBlocks(clearedLines);
     }
+
+    // update counters
+    this.otherLines.setCounter(lines);
+    this.otherLevel.setCounter(level);
+    this.otherScore.setCounter(score);
   }
+
 }
 
 export default Multiplayer1v1State;
