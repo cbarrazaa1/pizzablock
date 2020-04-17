@@ -5,7 +5,7 @@ import Multiplayer1v1State from './states/Multiplayer1v1State';
 
 export const Screen = {
   width: 1080,
-  height: 720,
+  height: 800,
 };
 
 class Game {

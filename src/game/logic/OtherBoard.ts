@@ -52,7 +52,7 @@ class OtherBoard {
     }
 
     // shift blocks down
-    const shiftBlocks = (
+    const shiftInternal = (
       clearY: number,
       shiftCount: number,
     ): void => {
@@ -65,10 +65,10 @@ class OtherBoard {
     };
 
     if (sequentialClear) {
-      shiftBlocks(clearedLines[0], clearedLines.length);
+      shiftInternal(clearedLines[0], clearedLines.length);
     } else {
-      shiftBlocks(clearedLines[0], 1);
-      shiftBlocks(clearedLines[1], 1);
+      shiftInternal(clearedLines[0], 1);
+      shiftInternal(clearedLines[1], 1);
     }
   }
 }
