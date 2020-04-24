@@ -28,18 +28,16 @@ export function checkIsAuthenticated() {
 } 
 
 export function authSignUp(credentials) {
-    let url = `${SERVER_URL}/users/create`;
+    let url = `${SERVER_URL}/create/user`;
     let settings = {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            email: credentials.email,
-            password: credentials.password,
-            name: credentials.name
-        })
+        body: JSON.stringify(credentials)
     }
+
+    console.log(credentials);
 
     return fetch(url, settings)
         .then(response => {
