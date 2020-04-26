@@ -4,6 +4,8 @@ export enum PacketType {
 
   S_1v1_ENTER_GAME,
   S_1v1_PLAYER_PLACE_BLOCK,
+  S_1v1_GAME_OVER,
+  S_1v1_END_GAME,
 }
 
 export class Packet {
@@ -78,6 +80,34 @@ export class PlayerPlaceBlockPacket extends Packet {
   constructor(data: PlayerPlaceBlockData) {
     super();
     this.type = PacketType.S_1v1_PLAYER_PLACE_BLOCK;
+    this.data = data;
+  }
+}
+
+type GameOverPacketData = {
+  readonly whoID: string;
+}
+
+export class GameOverPacket extends Packet {
+  public data: GameOverPacketData;
+
+  constructor(data: GameOverPacketData) {
+    super();
+    this.type = PacketType.S_1v1_GAME_OVER;
+    this.data = data;
+  }
+}
+
+type EndGamePacketData = {
+  readonly winnerID: string;
+}
+
+export class EndGamePacket extends Packet {
+  public data: EndGamePacketData;
+
+  constructor(data: EndGamePacketData) {
+    super();
+    this.type = PacketType.S_1v1_END_GAME;
     this.data = data;
   }
 }

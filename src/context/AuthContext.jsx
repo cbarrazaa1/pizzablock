@@ -20,6 +20,7 @@ export default function Auth({ children }) {
             .then((result) => {
                 setIsLoading(false);
                 if (result.success) {
+                    console.log(result);
                     setUser({id: result.id, name: result.name})
                     setIsAuthenticated(true);
                 } else {

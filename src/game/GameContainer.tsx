@@ -2,14 +2,26 @@ import * as React from 'react';
 import {useState, useCallback, useRef, useEffect} from 'react';
 import Game, {Screen} from './Game';
 import {Nullable} from '../util/Types';
+import { GameState } from './states/State';
 
-function GameContainer(): JSX.Element {
+export type GameUser = {
+  id: string;
+  name: string;
+}
+
+type Props = {
+  state: GameState;
+  user: GameUser;
+};
+
+function GameContainer({state, user}: Props): JSX.Element {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [game, setGame] = useState<Nullable<Game>>(null);
 
   const inputCallback = useCallback(e => game?.input(e), [game]);
 
   useEffect(() => {
+    console.log(user);
     setGame(new Game(canvas.current!.getContext('2d')!));
   }, []);
 
