@@ -60,7 +60,7 @@ class Text extends Widget {
     if (!this.visible) {
       return;
     }
-    
+
     const style = this.style as TextStyleProps;
 
     g.font = this.formatFont();

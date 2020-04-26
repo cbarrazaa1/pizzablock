@@ -112,7 +112,7 @@ class Board {
 
     this.selectedBlock = new Block(4, 0);
     this.nextBlock = new Block(4, 0);
-    
+
     if (initialLevel != null) {
       this.level = initialLevel;
     } else {
@@ -202,7 +202,6 @@ class Board {
                 shape.rotations[rotation][j][i] === 1 &&
                 this.mat[x + i][y + j + 1].value === 1
               ) {
-
                 if (this.onPlaceBlock != null) {
                   this.onPlaceBlock({
                     x,
@@ -211,7 +210,7 @@ class Board {
                     type: this.selectedBlock.type,
                   });
                 }
-                
+
                 for (let ii = 0; ii < shapeWidth; ii++) {
                   for (let jj = 0; jj < shapeHeight; jj++) {
                     if (shape.rotations[rotation][jj][ii] === 1) {
@@ -598,7 +597,11 @@ class Board {
         if (this.onlineGameEnded) {
           text = 'Press Enter to exit.';
           size = g.measureText(text);
-          g.fillText(text, BOARD_X + width / 2 - size.width / 2, height / 2 + 26);
+          g.fillText(
+            text,
+            BOARD_X + width / 2 - size.width / 2,
+            height / 2 + 26,
+          );
         }
       }
     }

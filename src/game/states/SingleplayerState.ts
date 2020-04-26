@@ -35,16 +35,28 @@ class SingleplayerState extends State {
     };
 
     this.myLines = new CounterComponent(
-      boardXWidth + 20, boardY + 1, 200, 60, 'Lines'
+      boardXWidth + 20,
+      boardY + 1,
+      200,
+      60,
+      'Lines',
     );
 
     this.myLevel = new CounterComponent(
-      boardXWidth + 20, boardY + 81, 200, 60, 'Level'
+      boardXWidth + 20,
+      boardY + 81,
+      200,
+      60,
+      'Level',
     );
 
     this.myScore = new CounterComponent(
-      boardXWidth + 20, boardY + 161, 200, 60, 'Score'
-    )
+      boardXWidth + 20,
+      boardY + 161,
+      200,
+      60,
+      'Score',
+    );
 
     this.nextBlock = new NextBlockComponent(32);
     this.cntNextBlock = new Container(

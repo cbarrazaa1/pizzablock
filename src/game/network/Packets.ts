@@ -15,7 +15,7 @@ export class Packet {
   constructor() {
     this.type = -1;
   }
-};
+}
 
 type EnterQueuePacketData = {};
 
@@ -34,7 +34,7 @@ type PlaceBlockPacketData = {
   readonly y: number;
   readonly data: number[][];
   readonly type: number;
-}
+};
 
 export class PlaceBlockPacket extends Packet {
   public data: PlaceBlockPacketData;
@@ -67,7 +67,7 @@ type PlayerPlaceBlockData = {
     readonly y: number;
     readonly data: number[][];
     readonly type: number;
-  },
+  };
   readonly level: number;
   readonly score: number;
   readonly lines: number;
@@ -86,7 +86,7 @@ export class PlayerPlaceBlockPacket extends Packet {
 
 type GameOverPacketData = {
   readonly whoID: string;
-}
+};
 
 export class GameOverPacket extends Packet {
   public data: GameOverPacketData;
@@ -100,7 +100,7 @@ export class GameOverPacket extends Packet {
 
 type EndGamePacketData = {
   readonly winnerID: string;
-}
+};
 
 export class EndGamePacket extends Packet {
   public data: EndGamePacketData;

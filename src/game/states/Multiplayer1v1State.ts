@@ -276,15 +276,9 @@ class Multiplayer1v1State extends State {
       this.handlePlayerPlaceBlock.bind(this),
     );
 
-    this.client.on(
-      PacketType.S_1v1_GAME_OVER,
-      this.handleGameOver.bind(this),
-    );
+    this.client.on(PacketType.S_1v1_GAME_OVER, this.handleGameOver.bind(this));
 
-    this.client.on(
-      PacketType.S_1v1_END_GAME,
-      this.handleEndGame.bind(this),
-    );
+    this.client.on(PacketType.S_1v1_END_GAME, this.handleEndGame.bind(this));
   }
 
   private handleEnterGame(packet: EnterGamePacket): void {

@@ -23,7 +23,7 @@ enum AlphaState {
   NORMAL,
   HOVER,
   CLICKED,
-};
+}
 
 class Container extends Widget {
   private children: StrMap<Widget> = {};
@@ -69,7 +69,7 @@ class Container extends Widget {
       return;
     }
 
-    Object.values(this.children).forEach(child => child.update(delta));
+    Object.values(this.children).forEach((child) => child.update(delta));
   }
 
   public input(e: InputEvent): void {
@@ -83,10 +83,8 @@ class Container extends Widget {
     const rect = canvas.getBoundingClientRect();
     const [x, y] = [this.getRealX(), this.getRealY()];
     const [mX, mY] = [ev.clientX - rect.left, ev.clientY - rect.top];
-    const intersects = (
-      (mX >= x && mX <= x + this.width) 
-      && (mY >= y && mY <= y + this.height)
-    );
+    const intersects =
+      mX >= x && mX <= x + this.width && mY >= y && mY <= y + this.height;
 
     if (this.isClickable) {
       if (intersects) {
@@ -104,14 +102,14 @@ class Container extends Widget {
       }
     }
 
-    Object.values(this.children).forEach(child => child.input(e));
+    Object.values(this.children).forEach((child) => child.input(e));
   }
 
   public render(g: CanvasRenderingContext2D): void {
     if (!this.visible) {
       return;
     }
-    
+
     const style = this.style as ContainerStyleProps;
     const color = style.backgroundColor!;
     // adjust depending on state
@@ -145,7 +143,7 @@ class Container extends Widget {
     g.strokeRect(x, y, this.width, this.height);
     g.fillRect(x, y, this.width, this.height);
 
-    Object.values(this.children).forEach(child => child.render(g));
+    Object.values(this.children).forEach((child) => child.render(g));
   }
 }
 

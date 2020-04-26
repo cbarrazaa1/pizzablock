@@ -1,7 +1,7 @@
 import Widget from '../Widget';
 import Block from '../../logic/Block';
 import {InputEvent} from '../../InputHandler';
-import { Nullable } from '../../../util/Types';
+import {Nullable} from '../../../util/Types';
 
 class NextBlockComponent extends Widget {
   private block: Nullable<Block>;
@@ -12,7 +12,7 @@ class NextBlockComponent extends Widget {
     this.block = null;
     this.blockSize = blockSize;
   }
-  
+
   public setBlock(block: Block): void {
     this.block = block;
     const {shape, rotation} = this.block;

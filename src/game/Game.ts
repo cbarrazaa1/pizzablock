@@ -1,4 +1,4 @@
-import State, { GameState } from './states/State';
+import State, {GameState} from './states/State';
 import {InputEvent} from './InputHandler';
 import SingleplayerState from './states/SingleplayerState';
 import Multiplayer1v1State from './states/Multiplayer1v1State';

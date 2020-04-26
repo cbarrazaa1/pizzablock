@@ -1,5 +1,5 @@
-import { Packet, PacketType } from './Packets';
-import { StrMap } from '../../util/Types';
+import {Packet, PacketType} from './Packets';
+import {StrMap} from '../../util/Types';
 
 type PacketHandler = (packet: Packet) => void;
 
