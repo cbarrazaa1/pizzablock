@@ -12,9 +12,9 @@ export enum InputKey {
 }
 
 export enum InputButton {
-  LEFT = 1,
-  RIGHT = 2,
-  MIDDLE = 4,
+  LEFT = 0,
+  RIGHT = 1,
+  MIDDLE = 2,
 }
 
 interface InputHandler {
@@ -43,6 +43,7 @@ const inputHandler: InputHandler = {
   isMouseDown: (button: InputButton, e: InputEvent): boolean => {
     const ev = e as React.MouseEvent;
     if (ev.type === 'mousedown') {
+      console.log(ev.button);
       return ev.button === button;
     }
 
