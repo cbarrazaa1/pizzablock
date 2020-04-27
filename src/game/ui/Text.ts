@@ -68,12 +68,14 @@ class Text extends Widget {
     if (this.parent != null) {
       if (this.centeredHorizontally) {
         this.x = this.parent.width / 2 - size.width / 2;
+        this.width = size.width;
       }
 
       if (this.centeredVertically) {
         const height =
           size.actualBoundingBoxAscent + size.actualBoundingBoxDescent;
         this.y = this.parent.height / 2 - height / 2;
+        this.height = height;
       }
     }
 

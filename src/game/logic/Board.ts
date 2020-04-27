@@ -429,16 +429,8 @@ class Board {
     // restart game
     if (this.gameOver) {
       if (InputHandler.isKeyUp(InputKey.ENTER, e)) {
-        // restart for singleplayer
-        if (this.isSingleplayer) {
-          this.startGame();
-        }
-
-        // exit for multiplayer
-        if (!this.isSingleplayer && this.onlineGameEnded) {
-          if (this.onGameEnded != null) {
-            this.onGameEnded();
-          }
+        if (this.onGameEnded != null) {
+          this.onGameEnded();
         }
       }
     }

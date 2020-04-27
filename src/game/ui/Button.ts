@@ -1,7 +1,6 @@
 import Text from './Text';
 import Container from './Container';
 import Color from '../Color';
-import {Nullable} from '../../util/Types';
 
 class Button extends Container {
   private txtLabel: Text;
@@ -25,6 +24,7 @@ class Button extends Container {
       borderColor: color,
       backgroundColor: color,
     });
+    this.isClickable = true;
   }
 }
 

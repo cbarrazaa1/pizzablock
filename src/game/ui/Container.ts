@@ -27,9 +27,9 @@ enum AlphaState {
 
 class Container extends Widget {
   private children: StrMap<Widget> = {};
-  private isClickable: boolean;
   private alphaState: AlphaState;
   private onPressCallback?: Nullable<OnPressCallback>;
+  protected isClickable: boolean;
 
   constructor(x: number, y: number, width: number, height: number) {
     super(x, y, width, height);
