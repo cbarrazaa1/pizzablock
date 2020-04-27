@@ -29,10 +29,6 @@ class SingleplayerState extends State {
     const boardX = 10,
       boardY = 10;
     const boardXWidth = boardX + BOARD_WIDTH * 32;
-    const cntStyle: ContainerStyleProps = {
-      borderWidth: 4,
-      borderColor: new Color(80, 80, 80, 255),
-    };
 
     this.myLines = new CounterComponent(
       boardXWidth + 20,

@@ -320,7 +320,7 @@ class Board {
                             self.timers.drop.setResetTime(
                               mapLevelToDropTimer(self.level),
                             );
-                            self.lineCounter = 0;
+                            self.lineCounter -= 10;
                           }
                         }
                       })
