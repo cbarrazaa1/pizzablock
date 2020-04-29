@@ -9,85 +9,164 @@ import WidgetManager from '../ui/WidgetManager';
 import CustomWidget from '../ui/CustomWidget';
 import Block from '../logic/Block';
 import {Screen} from '../Game';
+import CounterComponent from '../ui/custom/CounterComponent';
+import NextBlockComponent from '../ui/custom/NextBlockComponent';
+import Button from '../ui/Button';
+
+enum InternalState {
+  NONE,
+  MENU,
+  IN_GAME,
+}
 
 class SingleplayerState extends State {
   private static instance: Nullable<SingleplayerState> = null;
   private board!: Board;
+  private selectedLevel!: number;
   private widgets: WidgetManager;
-  private cntLines: Container;
-  private txtLines: Text;
-  private cntLevel: Container;
-  private txtLevel: Text;
-  private cntScore: Container;
-  private txtScore: Text;
+  private txtSelectedTitle: Text;
+  private txtSelectedLevel: Text;
+  private btnMinusOne: Button;
+  private btnMinusFive: Button;
+  private btnPlusOne: Button;
+  private btnPlusFive: Button;
+  private btnStart: Button;
+  private cntMenu: Container;
+  private myLines: CounterComponent;
+  private myLevel: CounterComponent;
+  private myScore: CounterComponent;
   private cntNextBlock: Container;
-  private nextBlock: CustomWidget;
+  private nextBlock: NextBlockComponent;
   private cntBoard: Container;
-  private cntMain: Container;
+  private cntGame: Container;
 
   constructor() {
     super();
     const boardX = 10,
       boardY = 10;
     const boardXWidth = boardX + BOARD_WIDTH * 32;
-    const cntStyle: ContainerStyleProps = {
-      borderWidth: 4,
-      borderColor: new Color(80, 80, 80, 255),
-    };
+    this.selectedLevel = 9;
 
-    this.txtLines = new Text(0, 0, 'Lines: 0')
+    // menu interface
+    this.txtSelectedTitle = new Text(0, 50, 'Selected Level')
       .centerHorizontally()
-      .centerVertically();
-    this.cntLines = new Container(boardXWidth + 20, boardY + 1, 200, 60)
-      .addChild('lineCount', this.txtLines)
-      .setStyle(cntStyle);
+      .setStyle({fontSize: 46});
 
-    this.txtLevel = new Text(0, 0, 'Level: 0')
+    this.txtSelectedLevel = new Text(0, 125, '9')
       .centerHorizontally()
-      .centerVertically();
-    this.cntLevel = new Container(boardXWidth + 20, boardY + 81, 200, 60)
-      .addChild('lvlCount', this.txtLevel)
-      .setStyle(cntStyle);
+      .setStyle({fontSize: 40});
+    
+    const buttonXBase = Screen.width / 2 - 32;
+    this.btnMinusOne = new Button(
+      buttonXBase - 70,
+      this.txtSelectedLevel.y - 15,
+      64,
+      64,
+      '- 1',
+      new Color(20, 20, 20, 255),
+    );
+    this.btnMinusOne.onPress(() => {
+      this.updateSelectedLevel(-1);
+    }).setStyle({borderColor: new Color(100, 100, 100, 255), borderWidth: 2.3});
 
-    this.txtScore = new Text(0, 0, 'Score: 0')
-      .centerHorizontally()
-      .centerVertically();
-    this.cntScore = new Container(boardXWidth + 20, boardY + 161, 200, 60)
-      .addChild('scoreCount', this.txtScore)
-      .setStyle(cntStyle);
+    this.btnMinusFive = new Button(
+      this.btnMinusOne.x - 72,
+      this.btnMinusOne.y,
+      64,
+      64,
+      '- 5',
+      new Color(20, 20, 20, 255),
+    );
+    this.btnMinusFive.onPress(() => {
+      this.updateSelectedLevel(-5);
+    }).setStyle({borderColor: new Color(100, 100, 100, 255), borderWidth: 2.3});
 
-    this.nextBlock = new CustomWidget()
-      .onUpdate((self: CustomWidget): void => {
-        self.data['block'] = this.board.nextBlock;
-      })
-      .onRender((self: CustomWidget, g: CanvasRenderingContext2D): void => {
-        const {shape, rotation, color} = self.data['block'] as Block;
-        const shapeHeight = shape.rotations[rotation].length;
-        const shapeWidth = shape.rotations[rotation][0].length;
-        const actualWidth = shapeWidth * 32;
-        const actualHeight = shapeHeight * 32;
-        const parentWidth = self.parent!.width;
-        const parentHeight = self.parent!.height;
+    this.btnPlusOne = new Button(
+      buttonXBase + 70,
+      this.txtSelectedLevel.y - 15,
+      64,
+      64,
+      '+ 1',
+      new Color(20, 20, 20, 255),
+    );
+    this.btnPlusOne.onPress(() => {
+      this.updateSelectedLevel(1);
+    }).setStyle({borderColor: new Color(100, 100, 100, 255), borderWidth: 2.3});
 
-        for (let i = 0; i < shapeWidth; i++) {
-          for (let j = 0; j < shapeHeight; j++) {
-            if (shape.rotations[rotation][j][i] === 1) {
-              g.fillStyle = color.toString();
-              g.fillRect(
-                self.getRealX() + parentWidth / 2 - actualWidth / 2 + i * 32,
-                self.getRealY() - 10 + parentHeight / 2 - actualHeight / 2 + j * 32,
-                32,
-                32,
-              );
-            }
-          }
-        }
-      });
+    this.btnPlusFive = new Button(
+      this.btnPlusOne.x + 72,
+      this.btnPlusOne.y,
+      64,
+      64,
+      '+ 5',
+      new Color(20, 20, 20, 255)
+    )
+    this.btnPlusFive.onPress(() => {
+      this.updateSelectedLevel(5);
+    }).setStyle({borderColor: new Color(100, 100, 100, 255), borderWidth: 2.3});
 
-    this.cntNextBlock = new Container(boardXWidth + 20, boardY + 241, 150, 130)
-      .addChild('nextBlock', this.nextBlock)
-      .addChild('label', new Text(0, 100, 'Next').centerHorizontally())
-      .setStyle(cntStyle);
+    const buttonX = Screen.width / 2 - 100;
+    const buttonY = Screen.height / 2 - 30;
+    this.btnStart = new Button(
+      buttonX,
+      buttonY,
+      200,
+      60,
+      'Start Game',
+      new Color(20, 20, 20, 255)
+    )
+    this.btnStart.onPress(() => {
+      this.board = new Board(this.cntBoard, 32, this.selectedLevel);
+      this.board.onGameEnded = (): void => {
+        this.cntMenu.setVisible(true);
+        this.cntGame.setVisible(false);
+      }
+      this.cntMenu.setVisible(false);
+      this.cntGame.setVisible(true);
+    }).setStyle({borderColor: new Color(100, 100, 100, 255), borderWidth: 2.3});
+
+    this.cntMenu = new Container(0, 0, Screen.width, Screen.height)
+      .addChild('txtSelectedTitle', this.txtSelectedTitle)
+      .addChild('txtSelectedLevel', this.txtSelectedLevel)
+      .addChild('btnMinusOne', this.btnMinusOne)
+      .addChild('btnMinusFive', this.btnMinusFive)
+      .addChild('btnPlusOne', this.btnPlusOne)
+      .addChild('btnPlusFive', this.btnPlusFive)
+      .addChild('btnStart', this.btnStart)
+      .setStyle({borderWidth: 0});
+
+    // game interface
+    this.myLines = new CounterComponent(
+      boardXWidth + 20,
+      boardY + 1,
+      200,
+      60,
+      'Lines',
+    );
+
+    this.myLevel = new CounterComponent(
+      boardXWidth + 20,
+      boardY + 81,
+      200,
+      60,
+      'Level',
+    );
+
+    this.myScore = new CounterComponent(
+      boardXWidth + 20,
+      boardY + 161,
+      200,
+      60,
+      'Score',
+    );
+
+    this.nextBlock = new NextBlockComponent(32);
+    this.cntNextBlock = new Container(
+      this.myScore.x,
+      this.myScore.y + this.myScore.height + 10,
+      150,
+      130,
+    ).addChild('nextBlock', this.nextBlock);
 
     this.cntBoard = new Container(
       boardX,
@@ -100,7 +179,7 @@ class SingleplayerState extends State {
       'board',
       new CustomWidget()
         .onInit((_): void => {
-          this.board = new Board(this.cntBoard, 32);
+          
         })
         .onUpdate((_, delta: number): void => {
           this.board.update(delta);
@@ -113,20 +192,21 @@ class SingleplayerState extends State {
         }),
     );
 
-    const mainWidth = this.cntBoard.width + this.cntLines.width + 40;
+    const mainWidth = this.cntBoard.width + this.myLines.width + 40;
     const mainHeight = this.cntBoard.height;
     const mainX = Screen.width / 2 - mainWidth / 2;
     const mainY = Screen.height / 2 - mainHeight / 2 - 10;
 
-    this.cntMain = new Container(mainX, mainY, mainWidth, mainHeight)
+    this.cntGame = new Container(mainX, mainY, mainWidth, mainHeight)
       .setStyle({borderWidth: 0})
-      .addChild('cntLines', this.cntLines)
-      .addChild('cntLevel', this.cntLevel)
-      .addChild('cntScore', this.cntScore)
+      .addChild('myLines', this.myLines)
+      .addChild('myLevel', this.myLevel)
+      .addChild('myScore', this.myScore)
       .addChild('cntNextBlock', this.cntNextBlock)
       .addChild('cntBoard', this.cntBoard);
 
-    this.widgets = new WidgetManager().addWidget('cntMain', this.cntMain);
+    this.cntGame.setVisible(false);
+    this.widgets = new WidgetManager().addWidget('cntGame', this.cntGame).addWidget('cntMenu', this.cntMenu)
   }
 
   public static getInstance(): SingleplayerState {
@@ -139,9 +219,13 @@ class SingleplayerState extends State {
 
   public update(delta: number): void {
     this.widgets.update(delta);
-    this.txtLines.text = `Lines: ${this.board.clearedLines.toString()}`;
-    this.txtLevel.text = `Level: ${this.board.level.toString()}`;
-    this.txtScore.text = `Score: ${this.board.score.toString()}`;
+    if (this.board != null) {
+      this.myLines.setCounter(this.board.clearedLines);
+      this.myLevel.setCounter(this.board.level);
+      this.myScore.setCounter(this.board.score);
+      this.nextBlock.setBlock(this.board.nextBlock);
+    }
+    this.txtSelectedLevel.text = `${this.selectedLevel}`;
   }
 
   public render(g: CanvasRenderingContext2D): void {
@@ -150,6 +234,15 @@ class SingleplayerState extends State {
 
   public input(e: InputEvent): void {
     this.widgets.input(e);
+  }
+
+  private updateSelectedLevel(amount: number): void {
+    this.selectedLevel += amount;
+    if (this.selectedLevel < 0) {
+      this.selectedLevel = 0;
+    } else if (this.selectedLevel > 29) {
+      this.selectedLevel = 29;
+    }
   }
 }
 

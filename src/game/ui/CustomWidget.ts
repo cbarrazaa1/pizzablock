@@ -1,6 +1,6 @@
-import Widget from "./Widget";
-import { InputEvent } from "../InputHandler";
-import { StrMap } from "../../util/Types";
+import Widget from './Widget';
+import {InputEvent} from '../InputHandler';
+import {StrMap} from '../../util/Types';
 
 type InitFunction = (self: CustomWidget) => void;
 type UpdateFunction = (self: CustomWidget, delta: number) => void;
@@ -61,7 +61,7 @@ class CustomWidget extends Widget {
     if (!this.visible) {
       return;
     }
-    
+
     this.renderFunc(this, g);
   }
 }

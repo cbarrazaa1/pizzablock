@@ -9,6 +9,8 @@ import {
   EnterQueuePacket,
   EnterGamePacket,
   PlayerPlaceBlockPacket,
+  EndGamePacket,
+  GameOverPacket,
 } from '../network/Packets';
 import Container from '../ui/Container';
 import {Screen} from '../Game';
@@ -53,6 +55,7 @@ class Multiplayer1v1State extends State {
   private cntOtherBoard: Container;
   private cntOtherField: Container;
   private txtOtherName: Text;
+  private otherID!: string;
   private otherScore: CounterComponent;
   private otherLines: CounterComponent;
   private otherLevel: CounterComponent;
@@ -63,7 +66,7 @@ class Multiplayer1v1State extends State {
     this.internalState = InternalState.NONE;
 
     // setup client socket
-    this.client = new Client(io('https://pizzablock-server.herokuapp.com/'));
+    this.client = new Client(io('localhost:4000'));
     this.initNetworkHandlers();
 
     // setup interface
@@ -250,6 +253,7 @@ class Multiplayer1v1State extends State {
   private initBoard(initialLevel: number): void {
     this.board = new Board(this.cntBoard, 32, initialLevel);
     this.board.level = initialLevel;
+    this.board.isSingleplayer = false;
     this.board.onPlaceBlock = this.sendPlaceBlock.bind(this);
   }
 
@@ -271,12 +275,18 @@ class Multiplayer1v1State extends State {
       PacketType.S_1v1_PLAYER_PLACE_BLOCK,
       this.handlePlayerPlaceBlock.bind(this),
     );
+
+    this.client.on(PacketType.S_1v1_GAME_OVER, this.handleGameOver.bind(this));
+
+    this.client.on(PacketType.S_1v1_END_GAME, this.handleEndGame.bind(this));
   }
 
   private handleEnterGame(packet: EnterGamePacket): void {
     const {otherID, initialLevel} = packet.data;
+    this.otherID = otherID;
     this.internalState = InternalState.IN_GAME;
     this.initBoard(initialLevel);
+    this.otherLevel.setCounter(initialLevel);
     this.cntMenu.setVisible(false);
     this.cntGame.setVisible(true);
   }
@@ -308,6 +318,23 @@ class Multiplayer1v1State extends State {
     this.otherScore.setCounter(score);
   }
 
+  private handleGameOver(packet: GameOverPacket): void {
+    if (this.otherID === packet.data.whoID) {
+      this.otherBoard.gameOver = true;
+    }
+  }
+
+  private handleEndGame(packet: EndGamePacket): void {
+    this.board.onlineGameEnded = true;
+    this.otherBoard.onlineGameEnded = true;
+    if (this.otherID !== packet.data.winnerID) {
+      this.board.isOnlineGameWinner = true;
+      this.otherBoard.isWinner = false;
+    } else {
+      this.board.isOnlineGameWinner = false;
+      this.otherBoard.isWinner = true;
+    }
+  }
 }
 
 export default Multiplayer1v1State;

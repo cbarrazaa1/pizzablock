@@ -69,6 +69,7 @@ export type PlaceBlockCallbackData = {
 };
 
 export type PlaceBlockCallback = (block: PlaceBlockCallbackData) => void;
+type GameEndedCallback = () => void;
 
 class Board {
   private mat!: BlockData[][];
@@ -88,6 +89,10 @@ class Board {
   public score!: number;
   public nextBlock!: Block;
   public onPlaceBlock?: PlaceBlockCallback;
+  public onGameEnded?: GameEndedCallback;
+  public isSingleplayer!: boolean;
+  public onlineGameEnded!: boolean;
+  public isOnlineGameWinner!: boolean;
 
   constructor(parent: Widget, blockSize: number, initialLevel?: number) {
     this.parent = parent;
@@ -107,7 +112,7 @@ class Board {
 
     this.selectedBlock = new Block(4, 0);
     this.nextBlock = new Block(4, 0);
-    
+
     if (initialLevel != null) {
       this.level = initialLevel;
     } else {
@@ -128,6 +133,9 @@ class Board {
     this.clearedLines = 0;
     this.lineCounter = 0;
     this.score = 0;
+    this.isSingleplayer = true;
+    this.onlineGameEnded = false;
+    this.isOnlineGameWinner = false;
   }
 
   private calcLineClearScore(lineCount: number): number {
@@ -194,7 +202,6 @@ class Board {
                 shape.rotations[rotation][j][i] === 1 &&
                 this.mat[x + i][y + j + 1].value === 1
               ) {
-
                 if (this.onPlaceBlock != null) {
                   this.onPlaceBlock({
                     x,
@@ -203,7 +210,7 @@ class Board {
                     type: this.selectedBlock.type,
                   });
                 }
-                
+
                 for (let ii = 0; ii < shapeWidth; ii++) {
                   for (let jj = 0; jj < shapeHeight; jj++) {
                     if (shape.rotations[rotation][jj][ii] === 1) {
@@ -313,7 +320,7 @@ class Board {
                             self.timers.drop.setResetTime(
                               mapLevelToDropTimer(self.level),
                             );
-                            self.lineCounter = 0;
+                            self.lineCounter -= 10;
                           }
                         }
                       })
@@ -422,7 +429,9 @@ class Board {
     // restart game
     if (this.gameOver) {
       if (InputHandler.isKeyUp(InputKey.ENTER, e)) {
-        this.startGame();
+        if (this.onGameEnded != null) {
+          this.onGameEnded();
+        }
       }
     }
   }
@@ -550,22 +559,43 @@ class Board {
       const width = BOARD_WIDTH * this.blockSize;
       const height = BOARD_HEIGHT * this.blockSize;
 
-      g.fillStyle = 'rgba(0, 0, 0, 0.6)';
+      g.fillStyle = 'rgba(0, 0, 0, 0.75)';
       g.fillRect(BOARD_X - 1, BOARD_Y - 1, width + 2, height + 2);
 
       let text = 'Game Over';
+      g.fillStyle = 'rgba(150, 0, 0, 1.0)';
+      if (!this.isSingleplayer && this.onlineGameEnded) {
+        if (this.isOnlineGameWinner) {
+          text = 'Winner';
+          g.fillStyle = 'rgba(0, 150, 0, 1.0)';
+        } else {
+          text = 'Loser';
+        }
+      }
       let size = null;
 
-      g.fillStyle = 'white';
       g.font = '30px Arial';
       size = g.measureText(text);
       g.fillText(text, BOARD_X + width / 2 - size.width / 2, height / 2);
 
       g.font = '16px Arial';
       text = 'Press Enter to play again.';
+      g.fillStyle = 'white';
       size = g.measureText(text);
 
-      g.fillText(text, BOARD_X + width / 2 - size.width / 2, height / 2 + 26);
+      if (this.isSingleplayer) {
+        g.fillText(text, BOARD_X + width / 2 - size.width / 2, height / 2 + 26);
+      } else {
+        if (this.onlineGameEnded) {
+          text = 'Press Enter to exit.';
+          size = g.measureText(text);
+          g.fillText(
+            text,
+            BOARD_X + width / 2 - size.width / 2,
+            height / 2 + 26,
+          );
+        }
+      }
     }
   }
 

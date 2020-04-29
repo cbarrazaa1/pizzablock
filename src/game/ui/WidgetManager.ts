@@ -24,15 +24,15 @@ class WidgetManager {
   }
 
   public update(delta: number): void {
-    Object.values(this.widgets).forEach(widget => widget.update(delta));
+    Object.values(this.widgets).forEach((widget) => widget.update(delta));
   }
 
   public input(e: InputEvent): void {
-    Object.values(this.widgets).forEach(widget => widget.input(e));
+    Object.values(this.widgets).forEach((widget) => widget.input(e));
   }
 
   public render(g: CanvasRenderingContext2D): void {
-    Object.values(this.widgets).forEach(widget => widget.render(g));
+    Object.values(this.widgets).forEach((widget) => widget.render(g));
   }
 }
 

@@ -1,7 +1,7 @@
 import Widget, {StyleProps} from './Widget';
 import Color from '../Color';
 import {StrMap, Nullable} from '../../util/Types';
-import {InputEvent} from '../InputHandler';
+import InputHandler, {InputEvent, InputButton} from '../InputHandler';
 
 export interface ContainerStyleProps extends StyleProps {
   backgroundColor?: Color;
@@ -17,12 +17,31 @@ function getDefaultStyle(): ContainerStyleProps {
   };
 }
 
+type OnPressCallback = () => void;
+
+enum AlphaState {
+  NORMAL,
+  HOVER,
+  CLICKED,
+}
+
 class Container extends Widget {
   private children: StrMap<Widget> = {};
+  private alphaState: AlphaState;
+  private onPressCallback?: Nullable<OnPressCallback>;
+  protected isClickable: boolean;
 
   constructor(x: number, y: number, width: number, height: number) {
     super(x, y, width, height);
     this.style = getDefaultStyle();
+    this.isClickable = false;
+    this.alphaState = AlphaState.NORMAL;
+  }
+
+  public onPress(onPress: OnPressCallback): Container {
+    this.onPressCallback = onPress;
+    this.isClickable = true;
+    return this;
   }
 
   public addChild(name: string, child: Widget): Container {
@@ -50,7 +69,7 @@ class Container extends Widget {
       return;
     }
 
-    Object.values(this.children).forEach(child => child.update(delta));
+    Object.values(this.children).forEach((child) => child.update(delta));
   }
 
   public input(e: InputEvent): void {
@@ -58,16 +77,59 @@ class Container extends Widget {
       return;
     }
 
-    Object.values(this.children).forEach(child => child.input(e));
+    // check for mouse
+    const ev = e as React.MouseEvent;
+    const canvas = ev.target as HTMLCanvasElement;
+    const rect = canvas.getBoundingClientRect();
+    const [x, y] = [this.getRealX(), this.getRealY()];
+    const [mX, mY] = [ev.clientX - rect.left, ev.clientY - rect.top];
+    const intersects =
+      mX >= x && mX <= x + this.width && mY >= y && mY <= y + this.height;
+
+    if (this.isClickable) {
+      if (intersects) {
+        this.alphaState = AlphaState.HOVER;
+        if (InputHandler.isMouseDown(InputButton.LEFT, e)) {
+          this.alphaState = AlphaState.CLICKED;
+          if (this.onPressCallback != null) {
+            this.onPressCallback();
+          }
+        } else {
+          this.alphaState = AlphaState.HOVER;
+        }
+      } else {
+        this.alphaState = AlphaState.NORMAL;
+      }
+    }
+
+    Object.values(this.children).forEach((child) => child.input(e));
   }
 
   public render(g: CanvasRenderingContext2D): void {
     if (!this.visible) {
       return;
     }
-    
+
     const style = this.style as ContainerStyleProps;
-    g.fillStyle = style.backgroundColor!.toString();
+    const color = style.backgroundColor!;
+    // adjust depending on state
+    switch (this.alphaState) {
+      case AlphaState.NORMAL:
+        if (this.isClickable) {
+          color.a = 200;
+        } else {
+          color.a = 255;
+        }
+        break;
+      case AlphaState.HOVER:
+        color.a = 160;
+        break;
+      case AlphaState.CLICKED:
+        color.a = 255;
+        break;
+    }
+
+    g.fillStyle = color.toString();
     g.lineJoin = 'round';
     g.lineWidth = style.borderWidth!;
     g.strokeStyle = style.borderColor!.toString();
@@ -81,7 +143,7 @@ class Container extends Widget {
     g.strokeRect(x, y, this.width, this.height);
     g.fillRect(x, y, this.width, this.height);
 
-    Object.values(this.children).forEach(child => child.render(g));
+    Object.values(this.children).forEach((child) => child.render(g));
   }
 }
 
