@@ -8,6 +8,7 @@ import colors from '../constants/colors';
 export default function Navigation(props) {
 
     let history = useHistory();
+    let {user} = useContext(AuthContext);
     const { logout } = useContext(AuthContext);
 
     const onLogout = () => {
@@ -24,9 +25,9 @@ export default function Navigation(props) {
                     <Nav className="justify-content-end mr-auto" >
                         <Nav.Link
                             className='ml-4'
-                            onClick={() => history.push('/store')}
+                            onClick={() => history.push('/shop')}
                         >
-                            Store
+                            Shop
                         </Nav.Link>
                         <Nav.Link
                             className='ml-4'
@@ -36,7 +37,7 @@ export default function Navigation(props) {
                         </Nav.Link>
                     </Nav>
                     <Nav className="justify-content-end ml-auto" >
-                        <Navbar.Text>Logged in as username</Navbar.Text>
+                        <Navbar.Text>Logged in as {user.name}</Navbar.Text>
                         <Nav.Link
                             className='ml-4'
                             onClick={() => onLogout()}

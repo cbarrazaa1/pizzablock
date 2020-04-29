@@ -14,7 +14,7 @@ class Game {
 
   constructor(g: CanvasRenderingContext2D) {
     this.g = g;
-    this.currentState = Multiplayer1v1State.getInstance();
+    this.currentState = SingleplayerState.getInstance();
   }
 
   public update(delta: number): void {
