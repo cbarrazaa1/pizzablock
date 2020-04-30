@@ -5,6 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import CustomAlert from '../components/CustomAlert';
 import globalStyles from '../constants/styles';
 
 function ShopItem(props) {
@@ -12,16 +13,33 @@ function ShopItem(props) {
     const [item, setItem] = useState(props.item);
     const [amount, setAmount] = useState(1);
 
+    const [alertVariant, setAlertVariant] = useState('danger');
+    const [alertMessage, setAlertMessage] = useState('');
+    const [showAlert, setShowAlert] = useState(false);
+
     const onAmountChange = (e) => {
         setAmount(e.target.value);
     }
 
     const onClickBuy = (e) => {
+        setShowAlert(false);
 
+        if (amount < 1) {
+            setAlertVariant('danger');
+            setAlertMessage('Please enter a valid amount');
+            setShowAlert(true);
+            return;
+        }
     }
 
     return (
         <div>
+            <CustomAlert
+				variant={alertVariant}
+				message={alertMessage} 
+				show={showAlert} 
+				onClose={() => {setShowAlert(false)}}
+			/>
             <Row>
                 <Col>
                     <Image style={styles.image} thumbnail src={item.image}/>
@@ -34,7 +52,7 @@ function ShopItem(props) {
                         <Form.Group as={Row}>
                             <Form.Label column sm={4}>Enter amount</Form.Label>
                             <Col sm={8}>
-                                <Form.Control type="number" value={amount} onChange={onAmountChange}/>
+                                <Form.Control min={1} type="number" value={amount} onChange={onAmountChange}/>
                             </Col>
                         </Form.Group>
                         <Button

@@ -8,6 +8,7 @@ import ShopItem from '../components/ShopItem';
 function ShopView(props) {
     const [items, setItems] = useState([
         {
+            _id: '1',
             name: "Pizzetos",
             description: "PizzaBlock's main currency",
             longDesc: "This is PizzaBlock's main currency. In order to enter a game to win a pizza, you must pay with pizzetos.",
@@ -15,6 +16,7 @@ function ShopView(props) {
             image: "https://cdn.discordapp.com/attachments/363727070683201538/704883158021177404/icon_pizza_v1.png"
         },
         {
+            _id: '2',
             name: "Super skin",
             description: "Customize your gameplay with this skins",
             longDesc: "Change the way you play with the new colors of this awesome skin that will send you flying.",

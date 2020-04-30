@@ -38,11 +38,6 @@ export function updateUserInfo(userId, updatedUser) {
                 throw new Error(response);
             })
             .then(responseJSON => {
-                console.log(responseJSON)
-                if (responseJSON.message === "success") {
-                    return {success: true, id: responseJSON.id, name: responseJSON.name};
-                } else {
-                    return {success: false};
-                }
+                return responseJSON
             })
 }
