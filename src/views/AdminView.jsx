@@ -1,71 +1,98 @@
-import React, { useState } from 'react';
-import Navigation from '../components/Navigation';
+import React, {useState} from 'react';
+import Tab from 'react-bootstrap/Tab';
+import Nav from 'react-bootstrap/Nav';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
 import Card from 'react-bootstrap/Card';
-import Button from 'react-bootstrap/Button';
+import CardDeck from 'react-bootstrap/CardDeck'
+import Chart from '../components/Chart'
+
+
 import globalStyles from '../constants/styles';
 
-function HomeView(props) {
-
-    const [games, setGames] = useState([
-        {
-            name: "1v1",
-            description: "Play against a single opponent to win a pizza",
-            image: "https://cdn.pomu.com/files/game/img_mobile/15644/Tetris-Cube_.webp"
-        },
-        {
-            name: "1v4",
-            description: "Play against a 4 opponents opponents to win a pizza",
-            image: "https://www.lifewire.com/thmb/lOcp49hO-GvkFM7JgrwZjRpZC_8=/1920x1080/filters:fill(auto,1)/how-to-play-tetris-99-on-nintendo-switch-featured-7af5d3957deb44f4a8d4c812d88946ce.jpg"
-        },
-        {
-            name: "One4All",
-            description: "Play against a 4 opponents opponent to win a pizza",
-            image: "https://cdn.pomu.com/files/game/img_mobile/15644/Tetris-Cube_.webp"
-        }
-    ])
+function AdminView(props) {
 
     return (
         <div>
-            <Navigation />
-            <h1 className='text-center my-5 pt-5'>Game modes</h1>
-            <div style={styles.groupContainer}>
-                {games.map((game, i) => {
-                    return (
-                        <Card style={styles.groupCard}>
-                            <Card.Img style={styles.thumbnail} variant="top" src={game.image} />
-                            <Card.Body>
-                                <Card.Title>{game.name}</Card.Title>
-                                <Card.Text>
-                                    {game.description}
-                                </Card.Text>
-                                <Button variant="flat" bg="flat" style={globalStyles.primaryButton}>Play</Button>
-                            </Card.Body>
-                        </Card>
-                    )
-                })}
-            </div>
+            <CardDeck>
+                <Card>
+                    <Tab.Container id="left-tabs-example" defaultActiveKey="first">
+                        <Row>
+                            <Col sm={3}>
+                                <Nav variant="graphs" className="flex-column">
+                                    <Nav.Item>
+                                        <Nav.Link eventKey="first">New Users</Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item>
+                                        <Nav.Link eventKey="second">Unique Visits</Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item>
+                                        <Nav.Link eventKey="third">Number of Games</Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item>
+                                        <Nav.Link eventKey="fourth">Revenue</Nav.Link>
+                                    </Nav.Item>
+                                </Nav>
+                            </Col>
+                            <Col sm={12}>
+                                <Tab.Content>
+                                    <Tab.Pane eventKey="first">
+                                        <Card>
+                                            <Card.Body>
+                                                <Card.Title>
+                                                    New Users in Time
+                                            </Card.Title>
+                                                <Card.Body>
+                                                    <Chart id="1" />
+                                                </Card.Body>
+                                            </Card.Body>
+                                        </Card>
+                                    </Tab.Pane>
+                                    <Tab.Pane eventKey="second">
+                                        <Card>
+                                            <Card.Body>
+                                                <Card.Title>
+                                                    Unique Visits in Time
+                                            </Card.Title>
+                                                <Card.Body>
+                                                    <Chart id="2" />
+                                                </Card.Body>
+                                            </Card.Body>
+                                        </Card>
+                                    </Tab.Pane>
+                                    <Tab.Pane eventKey="third">
+                                        <Card>
+                                            <Card.Body>
+                                                <Card.Title>
+                                                    Number of Games
+                                            </Card.Title>
+                                                <Card.Body>
+                                                    <Chart id="3" />
+                                                </Card.Body>
+                                            </Card.Body>
+                                        </Card>
+                                    </Tab.Pane>
+                                    <Tab.Pane eventKey="fourth">
+                                        <Card>
+                                            <Card.Body>
+                                                <Card.Title>
+                                                    Revenue
+                                            </Card.Title>
+                                                <Card.Body>
+                                                    <Chart id="4" />
+                                                </Card.Body>
+                                            </Card.Body>
+                                        </Card>
+                                    </Tab.Pane>
+                                </Tab.Content>
+                            </Col>
+                        </Row>            
+                    </Tab.Container>
+                </Card>
+            </CardDeck>
         </div>
     )
+    
 }
 
-const styles = {
-    groupContainer: {
-        display: 'block',
-        float: 'left',
-        textAlign: 'center'
-    },
-    groupCard: {
-        height: '400px',
-        margin: '30px',
-        display: 'block;',
-        float: 'left',
-        width: '18rem'
-    },
-    thumbnail: {
-        width: '18rem',
-        height: '50%',
-        objectFit: 'cover'
-    }
-}
-
-export default HomeView
+export default AdminView

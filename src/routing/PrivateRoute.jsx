@@ -3,6 +3,7 @@ import { Route, Redirect } from 'react-router-dom'
 import { AuthContext } from '../context/AuthContext';
 import Container from 'react-bootstrap/Container';
 import Navigation from '../components/Navigation';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 function PrivateRoute({ component: Component, ...otherProps }) {
 
@@ -25,7 +26,7 @@ function PrivateRoute({ component: Component, ...otherProps }) {
                                     <Redirect to={'/login'} />
                             )
                             :
-                            <h1>Cargando...</h1>
+                            <LoadingSpinner/>
                     )}
                 />
             </Container>

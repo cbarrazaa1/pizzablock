@@ -15,15 +15,7 @@ export function getUserInfo(userId) {
             throw new Error(response.statusText)
         })
         .then(responseJSON => {
-            console.log(responseJSON);
-            if (responseJSON.message === "success") {
-                return {success: true, id: responseJSON.id, name: responseJSON.name};
-            } else {
-                return {success: false};
-            }
-        })
-        .catch(error => {
-            console.log(error.statusText);
+            return responseJSON.foundUser;
         })
 }
 
@@ -46,14 +38,11 @@ export function updateUserInfo(userId, updatedUser) {
                 throw new Error(response);
             })
             .then(responseJSON => {
-                console.log(resonseJSON)
+                console.log(responseJSON)
                 if (responseJSON.message === "success") {
                     return {success: true, id: responseJSON.id, name: responseJSON.name};
                 } else {
                     return {success: false};
                 }
-            })
-            .catch(error => {
-                console.log(error.statusText);
             })
 }

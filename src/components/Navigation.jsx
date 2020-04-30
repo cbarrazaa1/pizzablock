@@ -35,6 +35,12 @@ export default function Navigation(props) {
                         >
                             Profile
                         </Nav.Link>
+                        <Nav.Link
+                            className='ml-4'
+                            onClick={() => history.push('/admin')}
+                        >
+                            Admin
+                        </Nav.Link>
                     </Nav>
                     <Nav className="justify-content-end ml-auto" >
                         <Navbar.Text>Logged in as {user.name}</Navbar.Text>
