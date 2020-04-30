@@ -22,7 +22,7 @@ function GameContainer({state, user}: Props): JSX.Element {
 
   useEffect(() => {
     setGame(new Game(canvas.current!.getContext('2d')!, state));
-  }, []);
+  }, [state]);
 
   useEffect(() => {
     if (game == null) {

@@ -15,7 +15,7 @@ function MainRouter() {
         <div>
             <Switch>
                 <PrivateRoute exact path="/" component={HomeView}/>
-                <PrivateRoute path="/play" component={GameView}/>
+                <PrivateRoute path="/play/:mode" component={GameView}/>
                 <PrivateRoute path="/profile" component={ProfileView}/>
                 <PrivateRoute path="/shop" component={ShopView}/>
                 <PrivateRoute path="/admin" component={AdminView}/>

@@ -20,7 +20,7 @@ export function checkIsAuthenticated() {
         .then(responseJSON => {
             console.log(responseJSON);
             if (responseJSON.message === "success") {
-                return {success: true, id: responseJSON.id, name: responseJSON.name};
+                return {success: true, id: responseJSON.id, name: responseJSON.user_name};
             } else {
                 return {success: false};
             }
@@ -75,7 +75,8 @@ export function authLogin(credentials) {
         })
         .then(responseJSON => {
             localStorage.setItem('token', responseJSON.token);
-            return {success: true, id: responseJSON.id, name: responseJSON.name}
+            console.log(responseJSON);
+            return {success: true, id: responseJSON.id, name: responseJSON.user_name}
         })
 }
 

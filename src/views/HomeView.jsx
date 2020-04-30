@@ -8,26 +8,22 @@ function HomeView(props) {
 
     const [games, setGames] = useState([
         {
+            name: "Singleplayer",
+            description: "Practice yours skills and aim for a highscore!",
+            image: "https://www.lifewire.com/thmb/lOcp49hO-GvkFM7JgrwZjRpZC_8=/1920x1080/filters:fill(auto,1)/how-to-play-tetris-99-on-nintendo-switch-featured-7af5d3957deb44f4a8d4c812d88946ce.jpg"
+        },
+        {
             name: "1v1",
             description: "Play against a single opponent to win a pizza.",
             image: "https://cdn.pomu.com/files/game/img_mobile/15644/Tetris-Cube_.webp"
         },
-        {
-            name: "1v4",
-            description: "Play against a 4 opponents opponents to win a pizza",
-            image: "https://www.lifewire.com/thmb/lOcp49hO-GvkFM7JgrwZjRpZC_8=/1920x1080/filters:fill(auto,1)/how-to-play-tetris-99-on-nintendo-switch-featured-7af5d3957deb44f4a8d4c812d88946ce.jpg"
-        },
-        {
-            name: "1v99",
-            description: "Play against the world to win a pizza",
-            image: "https://cdn02.nintendo-europe.com/media/images/10_share_images/games_15/nintendo_switch_download_software_1/H2x1_NSwitchDS_Tetris99_image1600w.jpg"
-        }
+        
     ])
 
     const history = useHistory();
 
     const onClickPlay = (e) => {
-        history.push('/play');
+        history.push(`/play/${e.target.value}`);
     }
 
     return (
@@ -48,6 +44,7 @@ function HomeView(props) {
                                     bg="flat"
                                     style={globalStyles.primaryButton}
                                     onClick={onClickPlay}
+                                    value={game.name}
                                 >
                                     Play
                                 </Button>

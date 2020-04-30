@@ -22,6 +22,7 @@ function ProfileView(props) {
         lastName: 'Frank',
         streetAddress: "Cumbres de los nacos",
         zipCode: '12343',
+        level: 0
     })
 
     const {user} = useContext(AuthContext);
@@ -80,7 +81,7 @@ function ProfileView(props) {
                     <div style={styles.stats}>
                         <Image style={styles.profilePic} roundedCircle src={'https://scontent.fntr8-1.fna.fbcdn.net/v/t1.0-9/17991265_1334293769940498_1530451888206001469_n.jpg?_nc_cat=103&_nc_sid=a4a2d7&_nc_ohc=NkEfskebyOMAX_1C7Fq&_nc_ht=scontent.fntr8-1.fna&oh=678645b1482a33d81312be1fb01e1449&oe=5EBDF921'}/>
                         <h1 style={styles.username}>{userInfo.user_name}</h1>
-                        <p style={styles.level}>Level 3</p>
+                        <p style={styles.level}>Level {userInfo.level}</p>
                     </div>
                 </div>
                 <h1 className="my-5 pt-3 text-center">Historial de Partidas</h1>
