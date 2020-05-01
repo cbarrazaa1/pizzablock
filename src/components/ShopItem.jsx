@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {useHistory} from 'react-router-dom';
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -17,6 +17,8 @@ function ShopItem(props) {
     const [alertMessage, setAlertMessage] = useState('');
     const [showAlert, setShowAlert] = useState(false);
 
+    const history = useHistory();
+
     const onAmountChange = (e) => {
         setAmount(e.target.value);
     }
@@ -30,19 +32,21 @@ function ShopItem(props) {
             setShowAlert(true);
             return;
         }
+
+        history.push(`/checkout/${item._id}?amount=${amount}`);
     }
 
     return (
         <div>
             <CustomAlert
-				variant={alertVariant}
-				message={alertMessage} 
-				show={showAlert} 
-				onClose={() => {setShowAlert(false)}}
-			/>
+                variant={alertVariant}
+                message={alertMessage}
+                show={showAlert}
+                onClose={() => { setShowAlert(false) }}
+            />
             <Row>
                 <Col>
-                    <Image style={styles.image} thumbnail src={item.image}/>
+                    <Image style={styles.image} thumbnail src={item.image} />
                 </Col>
                 <Col>
                     <div style={styles.desc}>
@@ -52,7 +56,7 @@ function ShopItem(props) {
                         <Form.Group as={Row}>
                             <Form.Label column sm={4}>Enter amount</Form.Label>
                             <Col sm={8}>
-                                <Form.Control min={1} type="number" value={amount} onChange={onAmountChange}/>
+                                <Form.Control min={1} type="number" value={amount} onChange={onAmountChange} />
                             </Col>
                         </Form.Group>
                         <Button
