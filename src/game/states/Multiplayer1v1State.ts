@@ -13,7 +13,7 @@ import {
   GameOverPacket,
 } from '../network/Packets';
 import Container from '../ui/Container';
-import {Screen} from '../Game';
+import Game, {Screen} from '../Game';
 import WidgetManager from '../ui/WidgetManager';
 import Text from '../ui/Text';
 import CounterComponent from '../ui/custom/CounterComponent';
@@ -55,6 +55,7 @@ class Multiplayer1v1State extends State {
   private cntOtherBoard: Container;
   private cntOtherField: Container;
   private txtOtherName: Text;
+  private otherName!: string;
   private otherID!: string;
   private otherScore: CounterComponent;
   private otherLines: CounterComponent;
@@ -78,7 +79,7 @@ class Multiplayer1v1State extends State {
       .addChild('txtStatus', this.txtStatus)
       .setStyle({borderWidth: 0});
 
-    this.txtMyName = new Text(0, 10, 'Me').centerHorizontally();
+    this.txtMyName = new Text(0, 10, Game.user.name).centerHorizontally();
 
     this.myLines = new CounterComponent(
       BOARD_WIDTH * 32 + 20,
@@ -258,7 +259,10 @@ class Multiplayer1v1State extends State {
   }
 
   private sendEnterQueue(): void {
-    this.client.sendData(new EnterQueuePacket());
+    this.client.sendData(new EnterQueuePacket({
+      userID: Game.user.id,
+      name: Game.user.name,
+    }));
   }
 
   private sendPlaceBlock(block: PlaceBlockCallbackData): void {
@@ -282,8 +286,10 @@ class Multiplayer1v1State extends State {
   }
 
   private handleEnterGame(packet: EnterGamePacket): void {
-    const {otherID, initialLevel} = packet.data;
+    const {otherID, otherName, initialLevel} = packet.data;
     this.otherID = otherID;
+    this.otherName = otherName;
+    this.txtOtherName.text = otherName;
     this.internalState = InternalState.IN_GAME;
     this.initBoard(initialLevel);
     this.otherLevel.setCounter(initialLevel);

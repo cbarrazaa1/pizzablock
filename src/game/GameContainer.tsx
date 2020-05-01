@@ -21,8 +21,8 @@ function GameContainer({state, user}: Props): JSX.Element {
   const inputCallback = useCallback((e) => game?.input(e), [game]);
 
   useEffect(() => {
-    setGame(new Game(canvas.current!.getContext('2d')!, state));
-  }, [state]);
+    setGame(new Game(canvas.current!.getContext('2d')!, state, user));
+  }, [state, user]);
 
   useEffect(() => {
     if (game == null) {

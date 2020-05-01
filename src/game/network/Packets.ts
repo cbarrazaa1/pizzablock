@@ -17,15 +17,18 @@ export class Packet {
   }
 }
 
-type EnterQueuePacketData = {};
+type EnterQueuePacketData = {
+  readonly userID: string;
+  readonly name: string;
+};
 
 export class EnterQueuePacket extends Packet {
   public data: EnterQueuePacketData;
 
-  constructor() {
+  constructor(data: EnterQueuePacketData) {
     super();
     this.type = PacketType.C_1V1_ENTER_QUEUE;
-    this.data = {};
+    this.data = data;
   }
 }
 
@@ -48,6 +51,7 @@ export class PlaceBlockPacket extends Packet {
 
 type EnterGamePacketData = {
   readonly otherID: string;
+  readonly otherName: string;
   readonly initialLevel: number;
 };
 
