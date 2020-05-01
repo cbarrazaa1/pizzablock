@@ -4,6 +4,8 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { AuthContext } from '../context/AuthContext';
 import colors from '../constants/colors';
+import Pizzeto from '../img/pizzeto.png';
+import Image from 'react-bootstrap/Image';
 
 export default function Navigation(props) {
 
@@ -43,7 +45,13 @@ export default function Navigation(props) {
                         </Nav.Link>
                     </Nav>
                     <Nav className="justify-content-end ml-auto" >
-                        <Navbar.Text>Logged in as {user.name}</Navbar.Text>
+                        <Navbar.Text>
+                        <div style={styles.balance}>
+                            Balance:
+                            <Image src={Pizzeto} style={styles.pizzeto}/>
+                            {user.balance}
+                        </div>
+                        </Navbar.Text>
                         <Nav.Link
                             className='ml-4'
                             onClick={() => onLogout()}
@@ -61,5 +69,18 @@ const styles = {
     mainNavbar: {
         backgroundColor: colors.dark,
         color: colors.white
+    },
+    pizzeto: {
+        position: 'relative',
+        width: '32x',
+        height: '32px',
+        bottom: '5px',
+        marginLeft: '9px',
+        marginRight: '5px',
+    },
+    balance: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'start',
     }
 }

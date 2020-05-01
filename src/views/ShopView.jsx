@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import globalStyles from '../constants/styles';
 import ShopItem from '../components/ShopItem';
 
+
 function ShopView(props) {
     const [items, setItems] = useState([
         {
@@ -42,33 +43,35 @@ function ShopView(props) {
     return (
         <div>
             <h1 className='text-center mb-5'>Shop</h1>
-            <div style={styles.groupContainer}>
-                {viewItem ? <ShopItem item={selectedItem} back={onBackToShop}/> : 
-                <div>
-                    {items.map((game, i) => {
-                        return (
-                            <Card style={styles.groupCard} className={"hvr-grow-shadow"}>
-                                <Card.Img style={styles.thumbnail} variant="top" src={game.image} />
-                                <Card.Body>
-                                    <Card.Title>{game.name}</Card.Title>
-                                    <Card.Text>
-                                        {game.description}
-                                    </Card.Text>
-                                    <Button
-                                        value={i}
-                                        variant="flat"
-                                        bg="flat"
-                                        style={globalStyles.primaryButton}
-                                        onClick={onClickMore}
-                                    >
-                                        More
-                                    </Button>
-                                </Card.Body>
-                            </Card>
-                        )
-                    })}
-                </div> 
-                }
+            <div>
+                <div style={styles.groupContainer}>
+                    {viewItem ? <ShopItem item={selectedItem} back={onBackToShop}/> : 
+                    <div>
+                        {items.map((item, i) => {
+                            return (
+                                <Card style={styles.groupCard} className={"hvr-grow-shadow"}>
+                                    <Card.Img style={styles.thumbnail} variant="top" src={item.image} />
+                                    <Card.Body>
+                                        <Card.Title>{item.name}</Card.Title>
+                                        <Card.Text>
+                                            {item.description}
+                                        </Card.Text>
+                                        <Button
+                                            value={i}
+                                            variant="flat"
+                                            bg="flat"
+                                            style={globalStyles.primaryButton}
+                                            onClick={onClickMore}
+                                        >
+                                            More
+                                        </Button>
+                                    </Card.Body>
+                                </Card>
+                            )
+                        })}
+                    </div> 
+                    }
+                </div>
             </div>
         </div>
     )
@@ -91,7 +94,7 @@ const styles = {
         width: '18rem',
         height: '50%',
         objectFit: 'cover'
-    }
+    },
 }
 
 export default ShopView

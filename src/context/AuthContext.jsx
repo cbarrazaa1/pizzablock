@@ -20,7 +20,7 @@ export default function Auth({ children }) {
             .then((result) => {
                 setIsLoading(false);
                 if (result.success) {
-                    setUser({id: result.id, name: result.name})
+                    setUser({id: result.id, name: result.name, balance: result.balance})
                     setIsAuthenticated(true);
                 } else {
                     setIsAuthenticated(false);
@@ -38,7 +38,7 @@ export default function Auth({ children }) {
         return authLogin(credentials)
             .then((result) => {
                 if (result.success) {
-                    setUser({id: result.id, name: result.name});
+                    setUser({id: result.id, name: result.name, balance: result.balance});
                     setIsAuthenticated(true);
                     return true;
                 } else {
