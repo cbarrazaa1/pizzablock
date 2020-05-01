@@ -2,6 +2,7 @@ import State, {GameState} from './states/State';
 import {InputEvent} from './InputHandler';
 import SingleplayerState from './states/SingleplayerState';
 import Multiplayer1v1State from './states/Multiplayer1v1State';
+import { GameUser } from './GameContainer';
 
 export const Screen = {
   width: 1080,
@@ -11,10 +12,12 @@ export const Screen = {
 class Game {
   private g: CanvasRenderingContext2D;
   private currentState: State;
+  public static user: GameUser;
 
-  constructor(g: CanvasRenderingContext2D, state: GameState) {
+  constructor(g: CanvasRenderingContext2D, state: GameState, user: GameUser) {
     this.g = g;
     this.currentState = SingleplayerState.getInstance();
+    Game.user = user;
 
     if (state === GameState.MULTIPLAYER_1v1) {
       this.currentState = Multiplayer1v1State.getInstance();
