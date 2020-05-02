@@ -6,9 +6,12 @@ import Button from 'react-bootstrap/Button';
 import CustomAlert from '../components/CustomAlert';
 import Row  from 'react-bootstrap/Row';
 import Col  from 'react-bootstrap/Col';
+import ImageUploader from 'react-images-upload';
 import colors from '../constants/colors';
 import globalStyles from '../constants/styles';
 import {authSignUp} from '../services/auth';
+import {uploadPofilePicture} from '../services/user';
+import LoadingSpinner from '../components/LoadingSpinner'
 
 function SignupView() {
 
@@ -26,6 +29,9 @@ function SignupView() {
   	const [alertVariant, setAlertVariant] = useState('danger');
     const [alertMessage, setAlertMessage] = useState('');
     const [showAlert, setShowAlert] = useState(false);
+
+    const [pictures, setPictures] = useState([])
+    const [loading, setLoading] = useState(false);
 
     const history = useHistory();
 
@@ -73,12 +79,27 @@ function SignupView() {
         setZipCode(event.target.value);
     }
 
+    const onDrop = (picture) => {
+        console.log(picture)
+        setPictures(picture);
+        console.log(pictures);
+    }
+
 	const postSignup= (e) => {
         e.preventDefault();
 
         if (confirmPassword !== password) {
             setAlertVariant('danger');
             setAlertMessage('Passwords do not match!');
+            setShowAlert(true);
+            return;
+        }
+
+        setLoading(true);
+
+        if (pictures.length < 1) {
+            setAlertVariant('danger');
+            setAlertMessage('Please select a profile picture');
             setShowAlert(true);
             return;
         }
@@ -97,10 +118,21 @@ function SignupView() {
         })
         .then(result => {
             if (result.success) {
-                history.push('/login');
+                return uploadPofilePicture(result.id, pictures)
             } else {
                 setAlertVariant('danger');
                 setAlertMessage('Error signing up');
+                setShowAlert(true);
+                setLoading(false);
+            }
+        })
+        .then(result => {
+            setLoading(false);
+            if (result) {
+                history.push('/login')
+            } else {
+                setAlertVariant('danger');
+                setAlertMessage('Error Uploading profile picture. Please try again');
                 setShowAlert(true);
             }
         })
@@ -108,6 +140,7 @@ function SignupView() {
             setAlertVariant('danger');
             setAlertMessage('Error signing up');
             setShowAlert(true);
+            setLoading(false);
         })
     }
 
@@ -120,110 +153,125 @@ function SignupView() {
                 onClose={onCloseAlert}
             />
             <h1 style={styles.loginTitle}>Signup</h1>
-            <div style={styles.loginCard}>
-                <Form onSubmit={postSignup}>
-                    <h3>Basic Information</h3>
-                    <Form.Group>
-                        <Form.Control
-                            type="text"
-                            placeholder="Username" 
-                            onChange={onUsernameChange} 
-                            required
+            {loading ? <LoadingSpinner/> :
+            <div>
+
+                <div style={styles.loginCard}>
+                    <Form onSubmit={postSignup}>
+                        <h3>Basic Information</h3>
+                        <Form.Group>
+                            <Form.Control
+                                type="text"
+                                placeholder="Username" 
+                                onChange={onUsernameChange} 
+                                required
+                            />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Control
+                                type="email"
+                                placeholder="Email" 
+                                onChange={onEmailChange} 
+                                required
+                            />
+                        </Form.Group>
+                        <Row>
+                            <Col>
+                                <Form.Group>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="First Name" 
+                                        onChange={onFirstNameChange} 
+                                        required
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Last Name" 
+                                        onChange={onLastNameChange} 
+                                        required
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <Form.Group>
+                            <Form.Control 
+                                type="password"
+                                placeholder="Password" 
+                                onChange={onPasswordChange} 
+                                required
+                            />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Control 
+                                type="password"
+                                placeholder="Confirm password" 
+                                onChange={onConfirmPasswordChange} 
+                                required
+                            />
+                        </Form.Group>
+                        <h3 className='mt-3'>Location</h3>
+                        <Form.Group>
+                            <Form.Label>Select your country</Form.Label>
+                            <Form.Control as="select" onChange={onCountryChange}>
+                                <option value="Mexico">Mexico</option>
+                                <option value="United States">United States</option>
+                                <option value="China">China</option>
+                                <option value="Canada">Canada</option>
+                                <option value="Guatemala">Guatemala</option>
+                            </Form.Control>
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Select your state</Form.Label>
+                            <Form.Control as="select" onChange={onStateChange}>
+                                <option value="Nuevo Leon">Nuevo Leon</option>
+                                <option value="Jalisco">Jalisco</option>
+                                <option value="Other">Other</option>
+                            </Form.Control>
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Control
+                                type="text"
+                                placeholder="Street address" 
+                                onChange={onStreetAddrChange} 
+                                required
+                            />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Control
+                                type="number"
+                                placeholder="Zip code" 
+                                onChange={onZipCodeChange} 
+                                required
+                            />
+                        </Form.Group>
+                        <h3 className={'py-3'}>Choose your profile picture</h3>
+                        <ImageUploader
+                            withIcon={true}
+                            buttonText='Choose picture'
+                            onChange={onDrop}
+                            imgExtension={['.jpg', '.gif', '.png', '.gif']}
+                            maxFileSize={5242880}
+                            singleImage={true}
+                            withPreview={true}
                         />
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Control
-                            type="email"
-                            placeholder="Email" 
-                            onChange={onEmailChange} 
-                            required
-                        />
-                    </Form.Group>
-                    <Row>
-                        <Col>
-                            <Form.Group>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="First Name" 
-                                    onChange={onFirstNameChange} 
-                                    required
-                                />
-                            </Form.Group>
-                        </Col>
-                        <Col>
-                            <Form.Group>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Last Name" 
-                                    onChange={onLastNameChange} 
-                                    required
-                                />
-                            </Form.Group>
-                        </Col>
-                    </Row>
-                    <Form.Group>
-                        <Form.Control 
-                            type="password"
-                            placeholder="Password" 
-                            onChange={onPasswordChange} 
-                            required
-                        />
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Control 
-                            type="password"
-                            placeholder="Confirm password" 
-                            onChange={onConfirmPasswordChange} 
-                            required
-                        />
-                    </Form.Group>
-                    <h3 className='mt-3'>Location</h3>
-                    <Form.Group>
-                        <Form.Label>Select your country</Form.Label>
-                        <Form.Control as="select" onChange={onCountryChange}>
-                            <option value="Mexico">Mexico</option>
-                            <option value="United States">United States</option>
-                            <option value="China">China</option>
-                            <option value="Canada">Canada</option>
-                            <option value="Guatemala">Guatemala</option>
-                        </Form.Control>
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label>Select your state</Form.Label>
-                        <Form.Control as="select" onChange={onStateChange}>
-                            <option value="Nuevo Leon">Nuevo Leon</option>
-                            <option value="Jalisco">Jalisco</option>
-                            <option value="Other">Other</option>
-                        </Form.Control>
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Control
-                            type="text"
-                            placeholder="Street address" 
-                            onChange={onStreetAddrChange} 
-                            required
-                        />
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Control
-                            type="number"
-                            placeholder="Zip code" 
-                            onChange={onZipCodeChange} 
-                            required
-                        />
-                    </Form.Group>
-                    <Button
-                        className="mt-3 mb-2" 
-                        variant="flat" 
-                        bg='flat' 
-                        type="submit"
-                        style={globalStyles.primaryButton}
-                    >
-                        Submit
-                    </Button>
-                </Form>
+                        <Button
+                            className="mt-3 mb-2" 
+                            variant="flat" 
+                            bg='flat' 
+                            type="submit"
+                            style={globalStyles.primaryButton}
+                        >
+                            Submit
+                        </Button>
+                    </Form>
+                </div>
+                <p>Or login <Link to="/login">here</Link></p>
             </div>
-            <p>Or login <Link to="/login">here</Link></p>
+            }
         </Container>
     )
 }

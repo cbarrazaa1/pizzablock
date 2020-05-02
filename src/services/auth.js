@@ -48,7 +48,7 @@ export function authSignUp(credentials) {
             throw new Error(response.statusText);
         })
         .then(responseJSON => {
-            return {success: true}
+            return {success: true, id: responseJSON._id}
         })
 }
 

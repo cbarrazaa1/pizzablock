@@ -15,7 +15,7 @@ export function getUserInfo(userId) {
             throw new Error(response.statusText)
         })
         .then(responseJSON => {
-            return responseJSON.foundUser;
+            return responseJSON;
         })
 }
 
@@ -41,3 +41,25 @@ export function updateUserInfo(userId, updatedUser) {
                 return responseJSON
             })
 }
+
+export function uploadPofilePicture(userId, filesraw) {
+    const files = Array.from(filesraw)
+
+    const formData = new FormData()
+
+    files.forEach((file, i) => {
+      formData.append(i, file)
+    })
+
+    console.log(formData)
+
+    return fetch(`${SERVER_URL}/update/user/${userId}/profilepic`, {
+        method: 'PUT',
+        body: formData,
+    })
+    .then(res => res.json())
+    .then(response => {
+        return response.success
+    })
+}
+
