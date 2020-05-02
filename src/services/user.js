@@ -30,16 +30,16 @@ export function updateUserInfo(userId, updatedUser) {
     }
 
     return fetch(url, settings)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
 
-                throw new Error(response);
-            })
-            .then(responseJSON => {
-                return responseJSON
-            })
+            throw new Error(response);
+        })
+        .then(responseJSON => {
+            return responseJSON
+        })
 }
 
 export function uploadPofilePicture(userId, filesraw) {

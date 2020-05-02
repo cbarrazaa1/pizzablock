@@ -6,6 +6,9 @@ import Table from 'react-bootstrap/Table';
 import Image from 'react-bootstrap/Image';
 import Checkmark from '../components/Checkmark';
 import { Link } from 'react-router-dom';
+import {updateUserInfo} from '../services/user';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
 function CheckoutView(props) {
 
@@ -23,7 +26,9 @@ function CheckoutView(props) {
     const [currency, setCurrency] = useState("USD");
     const [loading, setLoading] = useState(true);
     const [success, setSuccess] = useState(false);
-    const [timeout, setTimeout] = useState(false)
+    const [timeout, setTimeout] = useState(false);
+
+    const {user} = useContext(AuthContext)
 
     useEffect(() => {
         getItemInfo()
@@ -40,10 +45,19 @@ function CheckoutView(props) {
     }
 
     const onSuccess = () => {
-        setSuccess(true);
-        setInterval(() => {
-            setTimeout(true);
-        }, 1000)
+        let newBalance = user.balance + amount;
+
+        updateUserInfo(user.id, {balance: newBalance})
+            .then(response => {
+                user.balance = newBalance;
+                setSuccess(true);
+                setInterval(() => {
+                    setTimeout(true);
+                }, 700)
+            })
+            .catch(err => {
+                console.log("Error updating balance");
+            })        
     }
 
     return (

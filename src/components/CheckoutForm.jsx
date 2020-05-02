@@ -6,7 +6,8 @@ import {
 } from "@stripe/react-stripe-js";
 import { SERVER_URL } from '../config';
 import '../css/CheckoutForm.css';
-import Checkmark from '../components/Checkmark'
+import stripeImage from '../img/stripesecure.png'
+import Image from 'react-bootstrap/Image';
 
 function CheckoutForm(props) {
 
@@ -92,7 +93,10 @@ function CheckoutForm(props) {
     return (
         <div style={styles.container}>
             <form id="payment-form" onSubmit={handleSubmit} className="checkout-form">
-                <h4 className="mb-3">Payment Info</h4>
+                <div style={styles.imagecont}>
+                    <h4 className="mb-3">Payment Info</h4>
+                    <Image src={stripeImage} style={styles.image}/>
+                </div>
                 <CardElement id="card-element" options={cardStyle} onChange={handleChange} />
                 <button
                     disabled={processing || disabled || succeeded}
@@ -113,16 +117,6 @@ function CheckoutForm(props) {
                         {error}
                     </div>
                 )}
-                {/* Show a success message upon completion */}
-                <p className={succeeded ? "result-message" : "result-message hidden"}>
-                    Payment succeeded, see the result in your
-                    <a
-                        href={`https://dashboard.stripe.com/test/payments`}
-                    >
-                        {" "}
-            Stripe dashboard.
-            </a> Refresh the page to pay again.
-            </p>
             </form>
         </div>
     );
@@ -154,6 +148,17 @@ const styles = {
     checkoutButtonDisabled: {
         opacity: '0.5',
         cursor: 'default'
+    },
+    image: {
+        width: '80px',
+        height: '80px',
+        position: 'relative',
+        bottom: '20px'
+    },
+    imagecont: {
+        display: 'flex',
+        flexDirection:'row',
+        justifyContent: 'space-between'
     }
 }
 
