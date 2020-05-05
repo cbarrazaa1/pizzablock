@@ -29,29 +29,31 @@ function HomeView(props) {
     return (
         <div>
             <h1 className='text-center mb-5'>Game modes</h1>
-            <div style={styles.groupContainer}>
-                {games.map((game, i) => {
-                    return (
-                        <Card style={styles.groupCard} className={"hvr-grow-shadow"}>
-                            <Card.Img style={styles.thumbnail} variant="top" src={game.image} />
-                            <Card.Body>
-                                <Card.Title>{game.name}</Card.Title>
-                                <Card.Text>
-                                    {game.description}
-                                </Card.Text>
-                                <Button
-                                    variant="flat"
-                                    bg="flat"
-                                    style={globalStyles.primaryButton}
-                                    onClick={onClickPlay}
-                                    value={game.name}
-                                >
-                                    Play
-                                </Button>
-                            </Card.Body>
-                        </Card>
-                    )
-                })}
+            <div style={styles.mainContainer}>
+                <div style={styles.groupContainer}>
+                    {games.map((game, i) => {
+                        return (
+                            <Card style={styles.groupCard} className={"hvr-grow-shadow"}>
+                                <Card.Img style={styles.thumbnail} variant="top" src={game.image} />
+                                <Card.Body>
+                                    <Card.Title>{game.name}</Card.Title>
+                                    <Card.Text>
+                                        {game.description}
+                                    </Card.Text>
+                                    <Button
+                                        variant="flat"
+                                        bg="flat"
+                                        style={globalStyles.primaryButton}
+                                        onClick={onClickPlay}
+                                        value={game.name}
+                                    >
+                                        Play
+                                    </Button>
+                                </Card.Body>
+                            </Card>
+                        )
+                    })}
+                </div>
             </div>
         </div>
     )
@@ -74,6 +76,11 @@ const styles = {
         width: '18rem',
         height: '50%',
         objectFit: 'cover'
+    },
+    mainContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center'
     }
 }
 

@@ -68,9 +68,14 @@ function ProfileView(props) {
     const loadUser = () => {
         getUserInfo(user.id)
             .then(user => {
-                console.log(user);
                 setUserInfo(user);
                 setLoading(false);
+                user.games.forEach(g => {
+                    let date = new Date(g.createdAt)
+                    g.createdAt = date.toLocaleTimeString() + " on " + date.toDateString()
+                })
+                console.log(user.games)
+                setGames(user.games)
             })
             .catch(err => {
                 setAlertVariant('danger');
@@ -165,7 +170,7 @@ function ProfileView(props) {
                         <tr>
                             <th>Status</th>
                             <th>Mode</th>
-                            <th>Money Pool</th>
+                            <th>Pizzetos Pool</th>
                             <th>Date</th>
                         </tr>
                     </thead>
@@ -173,10 +178,14 @@ function ProfileView(props) {
                         {games.map((g, i) => {
                             return (
                                 <tr>
-                                    <td style={g.status == "Won" ? styles.won : styles.lost}>{g.status}</td>
-                                    <td>{g.mode}</td>
-                                    <td>{g.moneyPool} pizzetos</td>
-                                    <td>{g.prize}</td>
+                                    <td 
+                                        style={g.winner === user.id ? styles.won : styles.lost}
+                                    >
+                                        {g.winner === user.id ? "Won": "Lost"}
+                                    </td>
+                                    <td>{g.mode.name}</td>
+                                    <td>{g.money_pool} pizzetos</td>
+                                    <td>{g.createdAt}</td>
                                 </tr>
                             )
                         })}

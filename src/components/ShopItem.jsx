@@ -7,6 +7,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import CustomAlert from '../components/CustomAlert';
 import globalStyles from '../constants/styles';
+import pizzeto from '../img/pizzeto.png'
 
 function ShopItem(props) {
 
@@ -46,12 +47,12 @@ function ShopItem(props) {
             />
             <Row>
                 <Col>
-                    <Image style={styles.image} thumbnail src={item.image} />
+                    <Image style={styles.image} thumbnail src={item.imgUrl} />
                 </Col>
                 <Col>
                     <div style={styles.desc}>
                         <h1 style={styles.name}>{item.name}</h1>
-                        <h3>${item.price}</h3>
+                        <h3>{item.currency === "PZT" ? <Image src={pizzeto} style={styles.pizzeto}/> : <span>$</span>}{item.price}</h3>
                         <p style={styles.longDesc}>{item.longDesc}</p>
                         <Form.Group as={Row}>
                             <Form.Label column sm={4}>Enter amount</Form.Label>
@@ -98,7 +99,15 @@ const styles = {
     },
     longDesc: {
         marginTop: '20px'
-    }
+    },
+    pizzeto: {
+        position: 'relative',
+        width: '40x',
+        height: '40px',
+        bottom: '5px',
+        marginLeft: '9px',
+        marginRight: '5px',
+    },
 }
 
 export default ShopItem

@@ -1,7 +1,7 @@
 import {SERVER_URL} from '../config';
 
 export function getUserInfo(userId) {
-    let url = `${SERVER_URL}/get/user/${userId}`
+    let url = `${SERVER_URL}/get/usersWithGames/${userId}`
     let settings = {
         method: "GET"
     }

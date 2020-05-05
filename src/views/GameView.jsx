@@ -5,6 +5,7 @@ import GameContainer from '../game/GameContainer';
 import { GameState } from '../game/states/State';
 import { AuthContext } from '../context/AuthContext';
 import { useEffect , useState } from 'react';
+import colors from '../constants/colors';
 
 function GameView(props) {
     const {user} = useContext(AuthContext);
@@ -43,9 +44,21 @@ function GameView(props) {
 				show={showAlert} 
 				onClose={() => {setShowAlert(false)}}
 			/>
-            <GameContainer state={state} user={user} />
+            <div style={styles.border}>
+                <GameContainer state={state} user={user} />
+            </div>
         </div>
     )
+}
+
+const styles = {
+    border: {
+        backgroundColor: colors.primary,
+        padding: '20px 80px 20px 20px',
+        width: '1127px',
+        borderRadius: '30px',
+        boxShadow: '0px -1px 47px -6px rgba(0,0,0,0.75)'
+    }
 }
 
 export default GameView
