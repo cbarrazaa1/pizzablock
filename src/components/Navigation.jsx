@@ -21,10 +21,16 @@ export default function Navigation(props) {
     return (
         <>
             <Navbar bg="flat" variant="dark" style={styles.mainNavbar} expand="lg" fixed='top'>
-                <Navbar.Brand onClick={() => history.push('/')}>PizzaBlock</Navbar.Brand>
+                <Navbar.Brand style={styles.brand} onClick={() => history.push('/')}>PizzaBlock</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="justify-content-end mr-auto" >
+                        <Nav.Link
+                            className='ml-4'
+                            onClick={() => history.push('/')}
+                        >
+                            Play
+                        </Nav.Link>
                         <Nav.Link
                             className='ml-4'
                             onClick={() => history.push('/shop')}
@@ -82,5 +88,8 @@ const styles = {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'start',
+    },
+    brand: {
+        cursor: 'pointer'
     }
 }
