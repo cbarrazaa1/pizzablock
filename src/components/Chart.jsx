@@ -1,14 +1,17 @@
 import React, {useState, useEffect} from 'react';
-import {HorizontalBar} from 'react-chartjs-2';
+import {HorizontalBar, Bar} from 'react-chartjs-2';
 import {
   gamesLastMonth,
   shopEntriesLastMonth,
   usersLastMonth,
+  shopEntriesRevenueLastMonth,
+  shopEntriesPizzetosLastMonth,
 } from '../services/admin';
-import LoadingSpinner from '../components/LoadingSpinner';
+import LoadingSpinner from './LoadingSpinner';
 
 function Chart(props) {
   const [loading, setLoading] = useState(true);
+  const [isRevenue, setIsRevenue] = useState(false);
   const [id, setId] = useState(props.id);
   const [description, setDescription] = useState({});
   const [options, setOptions] = useState({
@@ -86,6 +89,7 @@ function Chart(props) {
           .then((response) => {
             updateDataset(response, 'Games From Last Month');
             setLoading(false);
+            setIsRevenue(false);
           })
           .catch((e) => {
             console.log(e);
@@ -96,6 +100,7 @@ function Chart(props) {
           .then((response) => {
             updateDataset(response, 'Shopped Items From Last Month');
             setLoading(false);
+            setIsRevenue(false);
           })
           .catch((e) => {
             console.log(e);
@@ -106,13 +111,33 @@ function Chart(props) {
           .then((response) => {
             updateDataset(response, 'New Users From Last Month');
             setLoading(false);
+            setIsRevenue(false);
           })
           .catch((e) => {
             console.log(e);
           });
         break;
       case 4:
-        data.labels = ['Hola', 'Como', 'Estas'];
+        shopEntriesRevenueLastMonth()
+          .then((response) => {
+            updateDataset(response, 'Total Revenue(MXN) From Last Month');
+            setLoading(false);
+            setIsRevenue(true);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+        break;
+      case 5:
+        shopEntriesPizzetosLastMonth()
+          .then((response) => {
+            updateDataset(response, 'Pizzetos Spent From Last Month');
+            setLoading(false);
+            setIsRevenue(true);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
         break;
       default:
         break;
@@ -120,7 +145,13 @@ function Chart(props) {
   };
   return (
     <div>
-      <HorizontalBar ref={myRef} data={data} options={options} />
+      {loading ? (
+        <LoadingSpinner />
+      ) : isRevenue ? (
+        <Bar ref={myRef} data={data} options={options} />
+      ) : (
+        <HorizontalBar ref={myRef} data={data} options={options} />
+      )}
     </div>
   );
 }
