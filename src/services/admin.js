@@ -56,3 +56,77 @@ export function usersLastMonth() {
       return responseJSON;
     });
 }
+export function shopEntriesRevenueLastMonth() {
+  let url = `${SERVER_URL}/get/shopEntriesRevenueLastMonth/`;
+  let settings = {
+    method: 'GET',
+  };
+
+  return fetch(url, settings)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+
+      throw new Error(response.statusText);
+    })
+    .then((responseJSON) => {
+      return responseJSON;
+    });
+}
+
+export function shopEntriesPizzetosLastMonth() {
+  let url = `${SERVER_URL}/get/shopEntriesPizzetosLastMonth/`;
+  let settings = {
+    method: 'GET',
+  };
+
+  return fetch(url, settings)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+
+      throw new Error(response.statusText);
+    })
+    .then((responseJSON) => {
+      return responseJSON;
+    });
+}
+export function totalPizzetos() {
+  let url = `${SERVER_URL}/get/shopEntriesPizzetosTotal/`;
+  let settings = {
+    method: 'GET',
+  };
+
+  return fetch(url, settings)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+
+      throw new Error(response.statusText);
+    })
+    .then((responseJSON) => {
+      return responseJSON;
+    });
+}
+
+export function totalRevenue() {
+  let url = `${SERVER_URL}/get/shopEntriesRevenueTotal/`;
+  let settings = {
+    method: 'GET',
+  };
+
+  return fetch(url, settings)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+
+      throw new Error(response.statusText);
+    })
+    .then((responseJSON) => {
+      return responseJSON;
+    });
+}
