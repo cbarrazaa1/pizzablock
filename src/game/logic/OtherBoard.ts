@@ -76,7 +76,11 @@ class OtherBoard {
       }
       let size = null;
 
-      g.font = '30px Arial';
+      if (this.blockSize === 32) {
+        g.font = '30px Arial';
+      } else if (this.blockSize === 16) {
+        g.font = '20px Arial';
+      }
       size = g.measureText(text);
       g.fillText(text, BOARD_X + width / 2 - size.width / 2, height / 2);
     }

@@ -1,32 +1,23 @@
-import {Nullable} from '../../util/Types';
-import InputHandler, {InputEvent, InputKey} from '../InputHandler';
 import State from './State';
-import io from 'socket.io-client';
+import {Nullable, StrMap} from '../../util/Types';
 import Client from '../network/Client';
-import {
-  PacketType,
-  PlaceBlockPacket,
-  EnterQueue1v1Packet,
-  EnterGame1v1Packet,
-  PlayerPlaceBlockPacket,
-  EndGamePacket,
-  GameOverPacket,
-} from '../network/Packets';
-import Container from '../ui/Container';
-import Game, {Screen} from '../Game';
 import WidgetManager from '../ui/WidgetManager';
 import Text from '../ui/Text';
+import Container from '../ui/Container';
 import CounterComponent from '../ui/custom/CounterComponent';
 import NextBlockComponent from '../ui/custom/NextBlockComponent';
-import Block from '../logic/Block';
+import OtherBoard from '../logic/OtherBoard';
 import Board, {
   BOARD_WIDTH,
   BOARD_HEIGHT,
   PlaceBlockCallbackData,
 } from '../logic/Board';
+import Game, {Screen} from '../Game';
 import CustomWidget from '../ui/CustomWidget';
-import OtherBoard from '../logic/OtherBoard';
-import {mapBlockTypeToColor} from '../logic/Block';
+import InputHandler, {InputEvent, InputKey} from '../InputHandler';
+import {EnterQueue1v4Packet, PlaceBlockPacket, PacketType, EnterGame1v4Packet, PlayerPlaceBlockPacket, GameOverPacket, EndGamePacket} from '../network/Packets';
+import io from 'socket.io-client';
+import { mapBlockTypeToColor } from '../logic/Block';
 
 enum InternalState {
   NONE,
@@ -35,12 +26,17 @@ enum InternalState {
   GAME_OVER,
 }
 
-class Multiplayer1v1State extends State {
-  private static instance: Nullable<Multiplayer1v1State> = null;
+type OtherPlayerInfo = {
+  id: string;
+  name: string;
+  board: OtherBoard;
+}
+
+class Multiplayer1v4State extends State {
+  private static instance: Nullable<Multiplayer1v4State> = null;
   private internalState: InternalState;
   private client: Client;
   private board!: Board;
-  private otherBoard!: OtherBoard;
   private widgets: WidgetManager;
   private txtStatus: Text;
   private cntMenu: Container;
@@ -52,19 +48,15 @@ class Multiplayer1v1State extends State {
   private myLevel: CounterComponent;
   private cntNextBlock: Container;
   private nextBlock: NextBlockComponent;
-  private cntOtherBoard: Container;
-  private cntOtherField: Container;
-  private txtOtherName: Text;
-  private otherName!: string;
-  private otherID!: string;
-  private otherScore: CounterComponent;
-  private otherLines: CounterComponent;
-  private otherLevel: CounterComponent;
+  private otherBoards: OtherBoard[] = new Array(4);
+  private cntOtherBoards: Container[] = new Array(4);
   private cntGame: Container;
+  private otherPlayersMap: StrMap<OtherPlayerInfo>;
 
   constructor() {
     super();
     this.internalState = InternalState.NONE;
+    this.otherPlayersMap = {};
 
     // setup client socket
     this.client = new Client(io('http://localhost:4000'));
@@ -130,7 +122,7 @@ class Multiplayer1v1State extends State {
     );
 
     this.cntMyField = new Container(
-      10,
+      0,
       0,
       BOARD_WIDTH * 32 + this.myLines.width + 30,
       BOARD_HEIGHT * 32 + 50,
@@ -142,82 +134,66 @@ class Multiplayer1v1State extends State {
       .addChild('myScore', this.myScore)
       .addChild('cntNextBlock', this.cntNextBlock);
 
-    this.txtOtherName = new Text(0, 10, 'Other').centerHorizontally();
+    this.cntGame = new Container(0, 0, Screen.width, Screen.height)
+      .setStyle({borderWidth: 0})
+      .addChild('cntMyField', this.cntMyField);
 
-    this.otherLines = new CounterComponent(
-      10,
-      40,
-      140,
-      50,
-      'Lines',
-    ).setTextStyle({fontSize: 16});
+    const baseX = this.cntMyField.x + this.cntMyField.width + 20;
+    const baseY = this.cntMyField.y + 16;
+    const otherBoardWidth = BOARD_WIDTH * 16;
+    const otherBoardHeight = BOARD_HEIGHT * 16;
+    let auxX = 0;
+    let auxY = 0;
+    for (let i = 0; i < 4; i++) {
+      if (i == 2) {
+        auxX = 0;
+        auxY = otherBoardHeight + 20;
+      }
 
-    this.otherLevel = new CounterComponent(
-      this.otherLines.x,
-      this.otherLines.y + this.otherLines.height + 10,
-      140,
-      50,
-      'Level',
-    ).setTextStyle({fontSize: 16});
+      this.cntOtherBoards[i] = new Container(
+        baseX + auxX,
+        baseY + auxY,
+        otherBoardWidth,
+        otherBoardHeight,
+      )
+      
+      this.cntOtherBoards[i].addChild(
+        'board',
+        new CustomWidget()
+          .onInit(() => {
+            this.otherBoards[i] = new OtherBoard(this.cntOtherBoards[i], 16);
+          })
+          .onRender((_, g: CanvasRenderingContext2D): void => {
+            this.otherBoards[i].render(g);
+          }),
+      );
 
-    this.otherScore = new CounterComponent(
-      this.otherLines.x,
-      this.otherLevel.y + this.otherLevel.height + 10,
-      140,
-      50,
-      'Score',
-    ).setTextStyle({fontSize: 16});
+      auxX = otherBoardWidth + 20;
+      this.cntGame.addChild(`cntOtherBoard_${i}`, this.cntOtherBoards[i]);
+    }
 
-    this.cntOtherBoard = new Container(
-      this.otherLines.x + this.otherLines.width + 10,
-      40,
-      BOARD_WIDTH * 32,
-      BOARD_HEIGHT * 32,
-    );
+    this.cntGame.setVisible(false);
 
-    this.cntOtherBoard.addChild(
-      'board',
-      new CustomWidget()
-        .onInit((): void => {
-          this.otherBoard = new OtherBoard(this.cntOtherBoard, 32);
-        })
-        .onRender((_, g: CanvasRenderingContext2D): void => {
-          this.otherBoard.render(g);
-        }),
-    );
-
-    this.cntOtherField = new Container(
-      this.cntMyField.width + 40,
-      0,
-      BOARD_WIDTH * 32 + this.otherLines.width + 30,
-      BOARD_HEIGHT * 32 + 50,
-    )
-      .addChild('txtOtherName', this.txtOtherName)
-      .addChild('otherBoard', this.cntOtherBoard)
-      .addChild('otherLines', this.otherLines)
-      .addChild('otherLevel', this.otherLevel)
-      .addChild('otherScore', this.otherScore);
-
-    const gameWidth = this.cntMyField.width + this.cntOtherField.width + 40;
+    // adapt game dimensions
+    const gameWidth =
+      this.cntMyField.width + this.cntOtherBoards[0].width * 2 + 40;
     const gameHeight = this.cntMyField.height;
     const gameX = Screen.width / 2 - gameWidth / 2;
     const gameY = Screen.height / 2 - gameHeight / 2;
 
-    this.cntGame = new Container(gameX, gameY, gameWidth, gameHeight)
-      .setStyle({borderWidth: 0})
-      .addChild('cntMyField', this.cntMyField)
-      .addChild('cntOtherField', this.cntOtherField);
-
-    this.cntGame.setVisible(false);
+    this.cntGame.x = gameX;
+    this.cntGame.y = gameY;
+    this.cntGame.width = gameWidth;
+    this.cntGame.height = gameHeight;
 
     this.widgets = new WidgetManager()
       .addWidget('cntMenu', this.cntMenu)
       .addWidget('cntGame', this.cntGame);
   }
 
-  public static getInstance(): Multiplayer1v1State {
+  public static getInstance(): Multiplayer1v4State {
     if (this.instance == null) {
-      this.instance = new Multiplayer1v1State();
+      this.instance = new Multiplayer1v4State();
     }
 
     return this.instance;
@@ -262,14 +238,17 @@ class Multiplayer1v1State extends State {
     const res = await fetch('https://geoip-db.com/json/', {
       method: 'GET',
     });
-    
-    const json = await res.json();
 
-    this.client.sendData(new EnterQueue1v1Packet({
-      userID: Game.user.id,
-      name: Game.user.name,
-      ip: json.IPv4,
-    }));
+    const json = await res.json();
+    console.log(json);
+
+    this.client.sendData(
+      new EnterQueue1v4Packet({
+        userID: Game.user.id,
+        name: Game.user.name,
+        ip: json.IPv4,
+      }),
+    );
   }
 
   private sendPlaceBlock(block: PlaceBlockCallbackData): void {
@@ -278,7 +257,7 @@ class Multiplayer1v1State extends State {
 
   private initNetworkHandlers(): void {
     this.client.on(
-      PacketType.S_1v1_ENTER_GAME,
+      PacketType.S_1v4_ENTER_GAME,
       this.handleEnterGame.bind(this),
     );
 
@@ -288,68 +267,59 @@ class Multiplayer1v1State extends State {
     );
 
     this.client.on(PacketType.S_GAME_OVER, this.handleGameOver.bind(this));
-
     this.client.on(PacketType.S_END_GAME, this.handleEndGame.bind(this));
   }
 
-  private handleEnterGame(packet: EnterGame1v1Packet): void {
-    const {otherID, otherName, initialLevel} = packet.data;
-    this.otherID = otherID;
-    this.otherName = otherName;
-    this.txtOtherName.text = otherName;
+  private handleEnterGame(packet: EnterGame1v4Packet): void {
+    const data = packet.data;
+    data.others.forEach(other => {
+      const playerInfo: OtherPlayerInfo = {
+        id: other.id,
+        name: other.name,
+        board: this.otherBoards[Object.keys(this.otherPlayersMap).length],
+      };
+      console.log(other.id, playerInfo);
+      this.otherPlayersMap[other.id] = playerInfo;
+    });
+
     this.internalState = InternalState.IN_GAME;
-    this.initBoard(initialLevel);
-    this.otherLevel.setCounter(initialLevel);
+    this.initBoard(data.initialLevel);
     this.cntMenu.setVisible(false);
     this.cntGame.setVisible(true);
   }
 
   private handlePlayerPlaceBlock(packet: PlayerPlaceBlockPacket): void {
-    const {block, clearedLines, lines, level, score} = packet.data;
-    console.log(packet.data);
-
+    const {block, clearedLines, lines, level, score, whoID} = packet.data;
+    
     // update board
     for (let i = 0; i < block.data.length; i++) {
       for (let j = 0; j < block.data[0].length; j++) {
         if (block.data[i][j] === 1) {
-          this.otherBoard.mat[block.x + j][block.y + i] = {
+          this.otherPlayersMap[whoID].board.mat[block.x + j][block.y + i] = {
             color: mapBlockTypeToColor(block.type),
             value: 1,
-          };
+          }
         }
       }
     }
 
     // clear lines
     if (clearedLines.length > 0) {
-      this.otherBoard.shiftBlocks(clearedLines);
+      this.otherPlayersMap[whoID].board.shiftBlocks(clearedLines);
     }
-
-    // update counters
-    this.otherLines.setCounter(lines);
-    this.otherLevel.setCounter(level);
-    this.otherScore.setCounter(score);
   }
 
   private handleGameOver(packet: GameOverPacket): void {
-    if (this.otherID === packet.data.whoID) {
-      this.otherBoard.gameOver = true;
-    }
+    Object.values(this.otherPlayersMap).forEach(other => {
+      if (other.id === packet.data.whoID) {
+        other.board.gameOver = true;
+      }
+    })
   }
 
   private handleEndGame(packet: EndGamePacket): void {
-    this.board.onlineGameEnded = true;
-    this.otherBoard.onlineGameEnded = true;
-    if (this.otherID !== packet.data.winnerID) {
-      this.board.isOnlineGameWinner = true;
-      this.otherBoard.isWinner = false;
-    } else {
-      this.board.isOnlineGameWinner = false;
-      this.otherBoard.isWinner = true;
-    }
-
     Game.history.push(`/results/${packet.data.gameID}`);
   }
 }
 
-export default Multiplayer1v1State;
+export default Multiplayer1v4State;
