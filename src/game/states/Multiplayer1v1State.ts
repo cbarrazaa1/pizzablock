@@ -294,6 +294,7 @@ class Multiplayer1v1State extends State {
 
   private handleEnterGame(packet: EnterGame1v1Packet): void {
     const {otherID, otherName, initialLevel} = packet.data;
+    this.otherBoard = new OtherBoard(this.cntOtherBoard, 32);
     this.otherID = otherID;
     this.otherName = otherName;
     this.txtOtherName.text = otherName;
@@ -350,6 +351,9 @@ class Multiplayer1v1State extends State {
 
     Game.history.push(`/results/${packet.data.gameID}`);
     this.internalState = InternalState.NONE;
+    this.cntMenu.setVisible(true);
+    this.cntGame.setVisible(false);
+    this.txtStatus.text = `Press 'Space' to enter game queue.`;
   }
 }
 
