@@ -310,15 +310,12 @@ class Multiplayer1v4State extends State {
   }
 
   private handleGameOver(packet: GameOverPacket): void {
-    Object.values(this.otherPlayersMap).forEach(other => {
-      if (other.id === packet.data.whoID) {
-        other.board.gameOver = true;
-      }
-    })
+    this.otherPlayersMap[packet.data.whoID].board.gameOver = true;
   }
 
   private handleEndGame(packet: EndGamePacket): void {
     Game.history.push(`/results/${packet.data.gameID}`);
+    this.internalState = InternalState.NONE;
   }
 }
 

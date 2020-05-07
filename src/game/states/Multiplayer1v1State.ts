@@ -349,6 +349,7 @@ class Multiplayer1v1State extends State {
     }
 
     Game.history.push(`/results/${packet.data.gameID}`);
+    this.internalState = InternalState.NONE;
   }
 }
 
