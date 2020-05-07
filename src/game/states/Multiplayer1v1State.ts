@@ -264,8 +264,7 @@ class Multiplayer1v1State extends State {
     });
     
     const json = await res.json();
-    console.log(json);
-    
+
     this.client.sendData(new EnterQueue1v1Packet({
       userID: Game.user.id,
       name: Game.user.name,
