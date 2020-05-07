@@ -62,23 +62,42 @@ export class PlaceBlockPacket extends Packet {
   }
 }
 
-type EnterGamePacketData = {
+type EnterGame1v1PacketData = {
   readonly otherID: string;
   readonly otherName: string;
   readonly initialLevel: number;
 };
 
-export class EnterGamePacket extends Packet {
-  public data: EnterGamePacketData;
+export class EnterGame1v1Packet extends Packet {
+  public data: EnterGame1v1PacketData;
 
-  constructor(data: EnterGamePacketData) {
+  constructor(data: EnterGame1v1PacketData) {
     super();
     this.type = PacketType.S_1v1_ENTER_GAME;
     this.data = data;
   }
 }
 
+type EnterGame1v4PacketData = {
+  readonly others: {
+    id: string,
+    name: string,
+  }[];
+  readonly initialLevel: number;
+}
+
+export class EnterGame1v4Packet extends Packet {
+  public data: EnterGame1v4PacketData;
+
+  constructor(data: EnterGame1v4PacketData) {
+    super();
+    this.type = PacketType.S_1v4_ENTER_GAME;
+    this.data = data;
+  }
+}
+
 type PlayerPlaceBlockData = {
+  readonly whoID: string;
   block: {
     readonly x: number;
     readonly y: number;

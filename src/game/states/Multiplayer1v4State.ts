@@ -1,23 +1,35 @@
-import State from "./State";
-import { Nullable } from "../../util/Types";
-import Client from "../network/Client";
-import WidgetManager from "../ui/WidgetManager";
-import Text from "../ui/Text";
-import Container from "../ui/Container";
-import CounterComponent from "../ui/custom/CounterComponent";
-import NextBlockComponent from "../ui/custom/NextBlockComponent";
-import OtherBoard from "../logic/OtherBoard";
-import Board, { BOARD_WIDTH, BOARD_HEIGHT, PlaceBlockCallbackData } from "../logic/Board";
-import Game, { Screen } from "../Game";
-import CustomWidget from "../ui/CustomWidget";
-import InputHandler, { InputEvent, InputKey } from "../InputHandler";
-import { EnterQueue1v1Packet, PlaceBlockPacket } from "../network/Packets";
+import State from './State';
+import {Nullable, StrMap} from '../../util/Types';
+import Client from '../network/Client';
+import WidgetManager from '../ui/WidgetManager';
+import Text from '../ui/Text';
+import Container from '../ui/Container';
+import CounterComponent from '../ui/custom/CounterComponent';
+import NextBlockComponent from '../ui/custom/NextBlockComponent';
+import OtherBoard from '../logic/OtherBoard';
+import Board, {
+  BOARD_WIDTH,
+  BOARD_HEIGHT,
+  PlaceBlockCallbackData,
+} from '../logic/Board';
+import Game, {Screen} from '../Game';
+import CustomWidget from '../ui/CustomWidget';
+import InputHandler, {InputEvent, InputKey} from '../InputHandler';
+import {EnterQueue1v4Packet, PlaceBlockPacket, PacketType, EnterGame1v4Packet, PlayerPlaceBlockPacket, GameOverPacket, EndGamePacket} from '../network/Packets';
+import io from 'socket.io-client';
+import { mapBlockTypeToColor } from '../logic/Block';
 
 enum InternalState {
   NONE,
   QUEUE_WAIT,
   IN_GAME,
   GAME_OVER,
+}
+
+type OtherPlayerInfo = {
+  id: string;
+  name: string;
+  board: OtherBoard;
 }
 
 class Multiplayer1v4State extends State {
@@ -39,10 +51,12 @@ class Multiplayer1v4State extends State {
   private otherBoards: OtherBoard[] = new Array(4);
   private cntOtherBoards: Container[] = new Array(4);
   private cntGame: Container;
+  private otherPlayersMap: StrMap<OtherPlayerInfo>;
 
   constructor() {
     super();
     this.internalState = InternalState.NONE;
+    this.otherPlayersMap = {};
 
     // setup client socket
     this.client = new Client(io('http://localhost:4000'));
@@ -104,11 +118,12 @@ class Multiplayer1v4State extends State {
         })
         .onRender((_, g: CanvasRenderingContext2D): void => {
           this.board.render(g);
-        })
+        }),
     );
 
     this.cntMyField = new Container(
-      10, 0,
+      0,
+      0,
       BOARD_WIDTH * 32 + this.myLines.width + 30,
       BOARD_HEIGHT * 32 + 50,
     )
@@ -119,15 +134,57 @@ class Multiplayer1v4State extends State {
       .addChild('myScore', this.myScore)
       .addChild('cntNextBlock', this.cntNextBlock);
 
-    // for (let i = 0; i < 5; i++) {
-    //   this.cntOtherBoards[i] = new Container()
-    // }
-
     this.cntGame = new Container(0, 0, Screen.width, Screen.height)
       .setStyle({borderWidth: 0})
       .addChild('cntMyField', this.cntMyField);
 
+    const baseX = this.cntMyField.x + this.cntMyField.width + 20;
+    const baseY = this.cntMyField.y + 16;
+    const otherBoardWidth = BOARD_WIDTH * 16;
+    const otherBoardHeight = BOARD_HEIGHT * 16;
+    let auxX = 0;
+    let auxY = 0;
+    for (let i = 0; i < 4; i++) {
+      if (i == 2) {
+        auxX = 0;
+        auxY = otherBoardHeight + 20;
+      }
+
+      this.cntOtherBoards[i] = new Container(
+        baseX + auxX,
+        baseY + auxY,
+        otherBoardWidth,
+        otherBoardHeight,
+      )
+      
+      this.cntOtherBoards[i].addChild(
+        'board',
+        new CustomWidget()
+          .onInit(() => {
+            this.otherBoards[i] = new OtherBoard(this.cntOtherBoards[i], 16);
+          })
+          .onRender((_, g: CanvasRenderingContext2D): void => {
+            this.otherBoards[i].render(g);
+          }),
+      );
+
+      auxX = otherBoardWidth + 20;
+      this.cntGame.addChild(`cntOtherBoard_${i}`, this.cntOtherBoards[i]);
+    }
+
     this.cntGame.setVisible(false);
+
+    // adapt game dimensions
+    const gameWidth =
+      this.cntMyField.width + this.cntOtherBoards[0].width * 2 + 40;
+    const gameHeight = this.cntMyField.height;
+    const gameX = Screen.width / 2 - gameWidth / 2;
+    const gameY = Screen.height / 2 - gameHeight / 2;
+
+    this.cntGame.x = gameX;
+    this.cntGame.y = gameY;
+    this.cntGame.width = gameWidth;
+    this.cntGame.height = gameHeight;
 
     this.widgets = new WidgetManager()
       .addWidget('cntMenu', this.cntMenu)
@@ -157,7 +214,7 @@ class Multiplayer1v4State extends State {
   public render(g: CanvasRenderingContext2D): void {
     this.widgets.render(g);
   }
-  
+
   public input(e: InputEvent): void {
     if (this.internalState === InternalState.NONE) {
       if (InputHandler.isKeyUp(InputKey.SPACE, e)) {
@@ -181,15 +238,17 @@ class Multiplayer1v4State extends State {
     const res = await fetch('https://geoip-db.com/json/', {
       method: 'GET',
     });
-    
+
     const json = await res.json();
     console.log(json);
-    
-    this.client.sendData(new EnterQueue1v1Packet({
-      userID: Game.user.id,
-      name: Game.user.name,
-      ip: json.IPv4,
-    }));
+
+    this.client.sendData(
+      new EnterQueue1v4Packet({
+        userID: Game.user.id,
+        name: Game.user.name,
+        ip: json.IPv4,
+      }),
+    );
   }
 
   private sendPlaceBlock(block: PlaceBlockCallbackData): void {
@@ -197,7 +256,69 @@ class Multiplayer1v4State extends State {
   }
 
   private initNetworkHandlers(): void {
+    this.client.on(
+      PacketType.S_1v4_ENTER_GAME,
+      this.handleEnterGame.bind(this),
+    );
+
+    this.client.on(
+      PacketType.S_PLAYER_PLACE_BLOCK,
+      this.handlePlayerPlaceBlock.bind(this),
+    );
+
+    this.client.on(PacketType.S_GAME_OVER, this.handleGameOver.bind(this));
+    this.client.on(PacketType.S_END_GAME, this.handleEndGame.bind(this));
+  }
+
+  private handleEnterGame(packet: EnterGame1v4Packet): void {
+    const data = packet.data;
+    data.others.forEach(other => {
+      const playerInfo: OtherPlayerInfo = {
+        id: other.id,
+        name: other.name,
+        board: this.otherBoards[Object.keys(this.otherPlayersMap).length],
+      };
+      console.log(other.id, playerInfo);
+      this.otherPlayersMap[other.id] = playerInfo;
+    });
+
+    this.internalState = InternalState.IN_GAME;
+    this.initBoard(data.initialLevel);
+    this.cntMenu.setVisible(false);
+    this.cntGame.setVisible(true);
+  }
+
+  private handlePlayerPlaceBlock(packet: PlayerPlaceBlockPacket): void {
+    const {block, clearedLines, lines, level, score, whoID} = packet.data;
     
+    // update board
+    for (let i = 0; i < block.data.length; i++) {
+      for (let j = 0; j < block.data[0].length; j++) {
+        if (block.data[i][j] === 1) {
+          this.otherPlayersMap[whoID].board.mat[block.x + j][block.y + i] = {
+            color: mapBlockTypeToColor(block.type),
+            value: 1,
+          }
+        }
+      }
+    }
+
+    // clear lines
+    if (clearedLines.length > 0) {
+      this.otherPlayersMap[whoID].board.shiftBlocks(clearedLines);
+    }
+  }
+
+  private handleGameOver(packet: GameOverPacket): void {
+    Object.values(this.otherPlayersMap).forEach(other => {
+      if (other.id === packet.data.whoID) {
+        other.board.gameOver = true;
+      }
+    })
+  }
+
+  private handleEndGame(packet: EndGamePacket): void {
+    Game.history.push(`/results/${packet.data.gameID}`);
   }
 }
 

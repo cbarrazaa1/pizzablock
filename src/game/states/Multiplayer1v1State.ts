@@ -7,7 +7,7 @@ import {
   PacketType,
   PlaceBlockPacket,
   EnterQueue1v1Packet,
-  EnterGamePacket,
+  EnterGame1v1Packet,
   PlayerPlaceBlockPacket,
   EndGamePacket,
   GameOverPacket,
@@ -292,7 +292,7 @@ class Multiplayer1v1State extends State {
     this.client.on(PacketType.S_END_GAME, this.handleEndGame.bind(this));
   }
 
-  private handleEnterGame(packet: EnterGamePacket): void {
+  private handleEnterGame(packet: EnterGame1v1Packet): void {
     const {otherID, otherName, initialLevel} = packet.data;
     this.otherID = otherID;
     this.otherName = otherName;
