@@ -6,7 +6,7 @@ import Client from '../network/Client';
 import {
   PacketType,
   PlaceBlockPacket,
-  EnterQueuePacket,
+  EnterQueue1v1Packet,
   EnterGamePacket,
   PlayerPlaceBlockPacket,
   EndGamePacket,
@@ -67,7 +67,7 @@ class Multiplayer1v1State extends State {
     this.internalState = InternalState.NONE;
 
     // setup client socket
-    this.client = new Client(io('localhost:4000'));
+    this.client = new Client(io('http://localhost:4000'));
     this.initNetworkHandlers();
 
     // setup interface
@@ -259,7 +259,7 @@ class Multiplayer1v1State extends State {
   }
 
   private sendEnterQueue(): void {
-    this.client.sendData(new EnterQueuePacket({
+    this.client.sendData(new EnterQueue1v1Packet({
       userID: Game.user.id,
       name: Game.user.name,
     }));
@@ -276,13 +276,13 @@ class Multiplayer1v1State extends State {
     );
 
     this.client.on(
-      PacketType.S_1v1_PLAYER_PLACE_BLOCK,
+      PacketType.S_PLAYER_PLACE_BLOCK,
       this.handlePlayerPlaceBlock.bind(this),
     );
 
-    this.client.on(PacketType.S_1v1_GAME_OVER, this.handleGameOver.bind(this));
+    this.client.on(PacketType.S_GAME_OVER, this.handleGameOver.bind(this));
 
-    this.client.on(PacketType.S_1v1_END_GAME, this.handleEndGame.bind(this));
+    this.client.on(PacketType.S_END_GAME, this.handleEndGame.bind(this));
   }
 
   private handleEnterGame(packet: EnterGamePacket): void {

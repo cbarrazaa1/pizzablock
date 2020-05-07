@@ -3,6 +3,7 @@ import {InputEvent} from '../InputHandler';
 export enum GameState {
   SINGLEPLAYER,
   MULTIPLAYER_1v1,
+  MULTIPLAYER_1v4,
 }
 
 abstract class State {
