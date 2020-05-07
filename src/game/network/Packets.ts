@@ -20,6 +20,7 @@ export class Packet {
 type EnterQueuePacketData = {
   readonly userID: string;
   readonly name: string;
+  readonly ip: string;
 };
 
 export class EnterQueuePacket extends Packet {
