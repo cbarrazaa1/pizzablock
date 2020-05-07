@@ -84,7 +84,6 @@ function HomeView(props) {
                 setShowAlert(true);
                 setLoading(false);
             }) 
-
     }
 
     return (

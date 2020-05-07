@@ -22,10 +22,10 @@ class Game {
     this.g = g;
     Game.user = user;
     Game.history = history;
-    this.currentState = Multiplayer1v4State.getInstance();
+    this.currentState = SingleplayerState.getInstance();
 
     if (state === GameState.MULTIPLAYER_1v1) {
-      this.currentState = Multiplayer1v4State.getInstance();
+      this.currentState = Multiplayer1v1State.getInstance();
     } else if (state === GameState.MULTIPLAYER_1v4) {
       this.currentState = Multiplayer1v4State.getInstance();
     }

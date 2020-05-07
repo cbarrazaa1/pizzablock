@@ -31,7 +31,7 @@ function GameView(props) {
             setState(GameState.MULTIPLAYER_1v1)
         } else if (stateString === '1v4') {
             console.log('1v4');
-            setState(GameState.MULTIPLAYER_1v1)
+            setState(GameState.MULTIPLAYER_1v4)
         } else {
             setAlertVariant('danger');
             setAlertMessage('Could not get game mode');

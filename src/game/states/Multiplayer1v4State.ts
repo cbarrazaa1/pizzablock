@@ -59,7 +59,7 @@ class Multiplayer1v4State extends State {
     this.otherPlayersMap = {};
 
     // setup client socket
-    this.client = new Client(io('http://localhost:4000'));
+    this.client = new Client(io('https://pizzablock-server.herokuapp.com/'));
     this.initNetworkHandlers();
 
     // setup interface
