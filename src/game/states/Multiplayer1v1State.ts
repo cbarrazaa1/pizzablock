@@ -349,7 +349,7 @@ class Multiplayer1v1State extends State {
       this.otherBoard.isWinner = true;
     }
 
-    window.location.replace(`/results/${packet.data.gameID}`);
+    Game.history.push(`/results/${packet.data.gameID}`);
   }
 }
 
