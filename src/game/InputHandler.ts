@@ -35,6 +35,7 @@ const inputHandler: InputHandler = {
   isKeyUp: (key: InputKey, e: InputEvent): boolean => {
     const ev = e as React.KeyboardEvent;
     if (ev.type === 'keyup') {
+      console.log(key, ev.key);
       return ev.key === key;
     }
 
@@ -43,7 +44,6 @@ const inputHandler: InputHandler = {
   isMouseDown: (button: InputButton, e: InputEvent): boolean => {
     const ev = e as React.MouseEvent;
     if (ev.type === 'mousedown') {
-      console.log(ev.button);
       return ev.button === button;
     }
 

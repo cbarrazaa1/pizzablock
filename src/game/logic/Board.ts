@@ -84,6 +84,10 @@ class Board {
   private lineCounter!: number;
   private parent: Widget;
   private blockSize: number;
+  private shadowY!: number;
+  private pressingDown!: boolean;
+  private rotatingCW!: boolean;
+  private rotatingCCW!: boolean;
   public clearedLines!: number;
   public level!: number;
   public score!: number;
@@ -123,6 +127,7 @@ class Board {
       drop: new Timer(mapLevelToDropTimer(this.level)),
       newBlock: new Timer(NEW_BLOCK_TIMER_DEFAULT),
       moveBlock: new Timer(MOVE_BLOCK_TIMER_DEFAULT),
+      pressDown: new Timer(60),
     };
     this.shouldSpawnBlock = false;
     this.movingLeft = false;
@@ -136,6 +141,10 @@ class Board {
     this.isSingleplayer = true;
     this.onlineGameEnded = false;
     this.isOnlineGameWinner = false;
+    this.shadowY = 0;
+    this.pressingDown = false;
+    this.rotatingCW = false;
+    this.rotatingCCW = false;
   }
 
   private calcLineClearScore(lineCount: number): number {
@@ -156,7 +165,23 @@ class Board {
       return;
     }
 
-    if (this.timers.drop.isActivated()) {
+    if (this.rotatingCW) {
+      if (this.canRotate(true)) {
+        this.selectedBlock.rotateCW();
+      }
+      this.rotatingCW = false;
+    }
+
+    if (this.rotatingCCW) {
+      if (this.canRotate(false)) {
+        this.selectedBlock.rotateCCW();
+      }
+      this.rotatingCCW = false;
+    }
+
+    if (this.timers.drop.isActivated() || (this.pressingDown && this.timers.pressDown.isActivated())) {
+      this.timers.drop.setResetTime(mapLevelToDropTimer(this.level));
+
       if (!this.shouldSpawnBlock) {
         let shouldFall = true;
         const {x, y, rotation, shape, color} = this.selectedBlock;
@@ -336,6 +361,9 @@ class Board {
       }
     }
     this.timers.drop.tick(delta);
+    if (this.pressingDown) {
+      this.timers.pressDown.tick(delta);
+    }
 
     // timer to spawn new block
     if (this.shouldSpawnBlock && !this.clearingLines) {
@@ -417,13 +445,25 @@ class Board {
 
     // rotation
     if (InputHandler.isKeyDown(InputKey.Z, e)) {
-      if (this.canRotate(true)) {
-        this.selectedBlock.rotateCW();
-      }
-    } else if (InputHandler.isKeyDown(InputKey.X, e)) {
-      if (this.canRotate(false)) {
-        this.selectedBlock.rotateCCW();
-      }
+      this.rotatingCW = true;
+    } 
+
+    if (InputHandler.isKeyDown(InputKey.X, e)) {
+      this.rotatingCCW = true;
+    }
+
+    // instant drop
+    if (InputHandler.isKeyUp(InputKey.SPACE, e)) {
+      this.selectedBlock.y = this.shadowY;
+      this.timers.drop.setResetTime(0);
+    }
+
+    if (InputHandler.isKeyDown(InputKey.DOWN, e)) {
+      this.pressingDown = true;
+    }
+
+    if (InputHandler.isKeyUp(InputKey.DOWN, e)) {
+      this.pressingDown = false;
     }
 
     // restart game
@@ -487,12 +527,12 @@ class Board {
     }
 
     // project the block shadow to the bottom and find the closest possible collision
-    let shadowY = BOARD_HEIGHT - shapeHeight;
+    this.shadowY = BOARD_HEIGHT - shapeHeight;
     let changedShadowY = false;
     for (let scanY = y + shapeHeight; scanY < BOARD_HEIGHT; scanY++) {
       for (let scanX = x; scanX <= x + shapeWidth - 1; scanX++) {
         if (this.mat[scanX][scanY].value === 1) {
-          shadowY = scanY - shapeHeight;
+          this.shadowY = scanY - shapeHeight;
           changedShadowY = true;
           break;
         }
@@ -505,7 +545,7 @@ class Board {
 
     // try to fit a bit lower if possible
     let endSimulation = false;
-    let originalShadowY = shadowY;
+    let originalShadowY = this.shadowY;
     if (changedShadowY) {
       for (let sim = 1; sim <= shapeHeight; sim++) {
         for (let i = 0; i < shapeWidth; i++) {
@@ -532,7 +572,7 @@ class Board {
         if (endSimulation) {
           break;
         } else {
-          shadowY = originalShadowY + sim;
+          this.shadowY = originalShadowY + sim;
         }
       }
     }
@@ -546,7 +586,7 @@ class Board {
           g.fillStyle = shadowColor.toString();
           g.fillRect(
             (x + i) * this.blockSize + BOARD_X,
-            (shadowY + j) * this.blockSize + BOARD_Y,
+            (this.shadowY + j) * this.blockSize + BOARD_Y,
             this.blockSize,
             this.blockSize,
           );
