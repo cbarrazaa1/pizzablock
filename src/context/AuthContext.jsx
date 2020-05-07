@@ -20,7 +20,12 @@ export default function Auth({ children }) {
             .then((result) => {
                 setIsLoading(false);
                 if (result.success) {
-                    setUser({id: result.id, name: result.name, balance: result.balance})
+                    setUser({
+                        id: result.id, 
+                        name: result.name, 
+                        balance: result.balance,
+                        role: result.role
+                    })
                     setIsAuthenticated(true);
                 } else {
                     setIsAuthenticated(false);
@@ -38,7 +43,12 @@ export default function Auth({ children }) {
         return authLogin(credentials)
             .then((result) => {
                 if (result.success) {
-                    setUser({id: result.id, name: result.name, balance: result.balance});
+                    setUser({
+                        id: result.id, 
+                        name: result.name, 
+                        balance: result.balance,
+                        role: result.role
+                    });
                     setIsAuthenticated(true);
                     return true;
                 } else {

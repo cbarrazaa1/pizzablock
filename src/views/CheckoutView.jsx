@@ -163,6 +163,7 @@ function CheckoutView(props) {
                             Buy Now
                         </Button>
                         }
+                    <p className={"mt-4"}>Or go back to the <Link to="/shop">Shop</Link></p>
                 </div>
                 }
             </div>

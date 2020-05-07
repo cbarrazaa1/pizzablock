@@ -19,6 +19,25 @@ export function getUserInfo(userId) {
         })
 }
 
+export function getUserInfoShort(userId) {
+    let url = `${SERVER_URL}/get/userLight/${userId}`
+    let settings = {
+        method: "GET"
+    }
+
+    return fetch(url, settings)
+        .then(response => {
+            if (response.ok) {
+                return response.json()
+            }
+
+            throw new Error(response.statusText)
+        })
+        .then(responseJSON => {
+            return responseJSON;
+        })
+}
+
 export function updateUserInfo(userId, updatedUser) {
     let url = `${SERVER_URL}/update/user/${userId}`
     let settings = {

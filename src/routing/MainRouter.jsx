@@ -10,6 +10,7 @@ import ProfileView from '../views/ProfileView';
 import ShopView from '../views/ShopView';
 import AdminView from '../views/AdminView';
 import CheckoutView from '../views/CheckoutView';
+import ResultsView from '../views/ResultsView';
 
 function MainRouter() {
 
@@ -22,6 +23,7 @@ function MainRouter() {
                 <PrivateRoute path="/shop" component={ShopView} />
                 <PrivateRoute path="/admin" component={AdminView} />
                 <PrivateRoute path="/checkout/:id" component={CheckoutView} />
+                <PrivateRoute path="/results" component={ResultsView} />
                 <NonAuthRoute path="/login" component={LoginView} />
                 <NonAuthRoute path="/signup" component={SignupView} />
             </Switch>
