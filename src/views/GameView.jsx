@@ -23,11 +23,14 @@ function GameView(props) {
     const getState = () => {
         let stateString = props.match.params.mode;
 
-        if (stateString == 'Singleplayer') {
+        if (stateString === 'Singleplayer') {
             console.log('single');
             setState(GameState.SINGLEPLAYER)
-        } else if (stateString == '1v1') {
+        } else if (stateString === '1v1') {
             console.log('multi');
+            setState(GameState.MULTIPLAYER_1v1)
+        } else if (stateString === '1v4') {
+            console.log('1v4');
             setState(GameState.MULTIPLAYER_1v1)
         } else {
             setAlertVariant('danger');

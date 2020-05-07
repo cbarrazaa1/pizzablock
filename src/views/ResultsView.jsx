@@ -7,6 +7,9 @@ import { Link } from 'react-router-dom';
 import colors from '../constants/colors';
 import pizzeto from '../img/pizzeto.png'
 import background from '../img/profileback.jpg';
+import Versus1v1 from '../components/Versus1v1';
+import Versus1vM from '../components/Versus1vM';
+import {getGameInfo} from '../services/game';
 
 function ResultsView(props) {
     
@@ -24,26 +27,66 @@ function ResultsView(props) {
 
     const {user} = useContext(AuthContext);
 
-    const [opponent, setOpponent] = useState({
+    const [opponents, setOpponents] = useState([{
         user_name: "Lokoboy",
         profilePicUrl: "https://scontent.fntr8-1.fna.fbcdn.net/v/t1.0-9/15337567_1187455724624304_5780697547058050808_n.jpg?_nc_cat=104&_nc_sid=a4a2d7&_nc_eui2=AeGznYFkbq4t-UWzEzgHwfJ3czwrotVhyZdzPCui1WHJl6soUMZ_SCMrmI1eTQsZEMAJTHUP9xFu1o6EyRbQTluV&_nc_ohc=ExkcnUpOUPgAX9BlBKm&_nc_ht=scontent.fntr8-1.fna&oh=0507d35c42daa489256cf23ac00b12a4&oe=5ED97D40",
-    })
+    }])
 
     const [userInfo, setUserInfo] = useState({})
     const [winner, setWinner] = useState(false)
 
     useEffect(() => {
-        getPlayers();
+        getGame();
     }, [])
 
-    const getPlayers = () => {
+    const getGame = () => {
+        let id = props.match.params.id
+
+        getGameInfo(id)
+            .then(g => {
+                setGame(g.foundGame)
+                getPlayers(g.foundGame)
+            })
+            .catch(e => {
+                console.log(e)
+            })
+    }
+
+    const getPlayers = (g) => {
+
+        let ops = []
+
+        g.users.forEach(u => {
+            if (u !== user.id) {
+                ops.push(u);
+            }
+        })
+
+        console.log("opponents found ", ops)
+
         getUserInfoShort(user.id)
             .then(useri => {
                 setUserInfo(useri)
-                setLoading(false);
-                setWinner(user.id === game.winner)
-                console.log(user)
-                console.log(game.winner)
+                setWinner(user.id === g.winner)
+                getOpponents(ops)
+            })
+            .catch(e => {
+                console.log(e)
+            })
+    }
+
+    const getOpponents = (ops) => {
+        let calls = ops.map((o, i) => {
+            return getUserInfoShort(o)
+        })
+
+        console.log("Calling for opponents")
+
+        Promise.all(calls)
+            .then(ops => {
+                setOpponents(ops)
+                console.log(ops)
+                setLoading(false)
             })
             .catch(e => {
                 console.log(e)
@@ -55,40 +98,15 @@ function ResultsView(props) {
             <h1 className="text-center">Game Results</h1>
             {loading ? <LoadingSpinner/> :
             <div style={styles.versus}>
-                <Row style={styles.back}>
-                    <Col style={styles.columnI}>
-                        <div style={styles.player}>
-                            <Image
-                                style={styles.profilePic} 
-                                roundedCircle 
-                                src={userInfo.profilePicUrl}
-                                className={'mx-4'}
-                            />
-                            <h2>{userInfo.user_name}</h2>
-                        </div>
-                    </Col>
-                    <Col style={styles.vscont}>
-                        <div >
-                            <h2 style={{fontSize: "50px"}}>VS</h2>
-                        </div>
-                    </Col>
-                    <Col style={styles.columnD}>
-                        <div style={styles.opponent}>
-                            <h2>{opponent.user_name}</h2>
-                            <Image
-                                style={styles.profilePic} 
-                                roundedCircle 
-                                src={opponent.profilePicUrl}
-                                className={'ml-4'}
-                            />
-                        </div>
-                    </Col>
-                </Row>
+                {opponents.length === 1 ?
+                <Versus1v1 userInfo={userInfo} opponent={opponents[0]} />
+                : <Versus1vM userInfo={userInfo} opponents={opponents} />
+                }
                 <div style={styles.message}>
                     {winner ? 
                     <div>
                         <h1 style={styles.winner}>You Won!</h1>
-                        <h5 className={"mt-4"}>By defeating you opponent you won a total of <strong style={{color: colors.dark}}>{game.money_pool}</strong> pizzetos which are redeemable for a pizza at the shop!</h5>
+                        <h5 className={"mt-4"}>By defeating you opponents you won a total of <strong style={{color: colors.dark}}>{game.money_pool}</strong> pizzetos which are redeemable for a pizza at the shop!</h5>
                     </div>
                     :
                     <div >

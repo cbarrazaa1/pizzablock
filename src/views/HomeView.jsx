@@ -33,6 +33,11 @@ function HomeView(props) {
             description: "Play against a single opponent to win a pizza.",
             image: "https://cdn.pomu.com/files/game/img_mobile/15644/Tetris-Cube_.webp"
         },
+        {
+            name: "1v4",
+            description: "Battle against 4 opponents to win the ultimate prize!",
+            image: "https://www.enter.co/wp-content/uploads/2020/01/Tetris-falling-blocks-1280x720-1024x768.jpg"
+        },
         
     ])
 
