@@ -20,6 +20,7 @@ export class Packet {
 type EnterQueuePacketData = {
   readonly userID: string;
   readonly name: string;
+  readonly ip: string;
 };
 
 export class EnterQueuePacket extends Packet {
@@ -104,6 +105,7 @@ export class GameOverPacket extends Packet {
 
 type EndGamePacketData = {
   readonly winnerID: string;
+  readonly gameID: string;
 };
 
 export class EndGamePacket extends Packet {
