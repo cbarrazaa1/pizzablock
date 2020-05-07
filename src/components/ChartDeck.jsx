@@ -5,12 +5,13 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Card from 'react-bootstrap/Card';
 import Chart from './Chart';
-import {totalPizzetos, totalRevenue} from './../services/admin';
+import {totalPizzetos, totalRevenue, totalVisitors} from './../services/admin';
 import LoadingSpinner from './LoadingSpinner';
 
 function ChartDeck(props) {
   const [revenue, setRevenue] = useState(0);
   const [pizzetos, setPizzetos] = useState(0);
+  const [visitors, setVisitors] = useState(0);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -30,6 +31,14 @@ function ChartDeck(props) {
     totalRevenue()
       .then((response) => {
         setRevenue(response.revenue);
+        setLoading(false);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    totalVisitors()
+      .then((response) => {
+        setVisitors(response.visits);
         setLoading(false);
       })
       .catch((e) => {
@@ -124,6 +133,7 @@ function ChartDeck(props) {
                   <Card.Body>
                     <Card.Title>Unique Visits in Page</Card.Title>
                     <Card.Body>
+                      <p>Total Unique Visits: {visitors} </p>
                       <Chart id="6" />
                     </Card.Body>
                   </Card.Body>

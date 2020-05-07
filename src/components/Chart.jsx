@@ -6,14 +6,13 @@ import {
   usersLastMonth,
   shopEntriesRevenueLastMonth,
   shopEntriesPizzetosLastMonth,
+  uniquevisitsLastMonth,
 } from '../services/admin';
 import LoadingSpinner from './LoadingSpinner';
 
 function Chart(props) {
   const [loading, setLoading] = useState(true);
-  const [isRevenue, setIsRevenue] = useState(false);
   const [id, setId] = useState(props.id);
-  const [description, setDescription] = useState({});
   const [options, setOptions] = useState({
     scales: {
       yAxes: [
@@ -89,7 +88,6 @@ function Chart(props) {
           .then((response) => {
             updateDataset(response, 'Games From Last Month');
             setLoading(false);
-            setIsRevenue(false);
           })
           .catch((e) => {
             console.log(e);
@@ -100,7 +98,6 @@ function Chart(props) {
           .then((response) => {
             updateDataset(response, 'Shopped Items From Last Month');
             setLoading(false);
-            setIsRevenue(false);
           })
           .catch((e) => {
             console.log(e);
@@ -111,7 +108,6 @@ function Chart(props) {
           .then((response) => {
             updateDataset(response, 'New Users From Last Month');
             setLoading(false);
-            setIsRevenue(false);
           })
           .catch((e) => {
             console.log(e);
@@ -122,7 +118,6 @@ function Chart(props) {
           .then((response) => {
             updateDataset(response, 'Total Revenue(MXN) From Last Month');
             setLoading(false);
-            setIsRevenue(true);
           })
           .catch((e) => {
             console.log(e);
@@ -133,7 +128,16 @@ function Chart(props) {
           .then((response) => {
             updateDataset(response, 'Pizzetos Spent From Last Month');
             setLoading(false);
-            setIsRevenue(true);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+        break;
+      case 6:
+        uniquevisitsLastMonth()
+          .then((response) => {
+            updateDataset(response, 'Unique visitors from Last Month');
+            setLoading(false);
           })
           .catch((e) => {
             console.log(e);
@@ -147,10 +151,8 @@ function Chart(props) {
     <div>
       {loading ? (
         <LoadingSpinner />
-      ) : isRevenue ? (
-        <Bar ref={myRef} data={data} options={options} />
       ) : (
-        <HorizontalBar ref={myRef} data={data} options={options} />
+        <Bar ref={myRef} data={data} options={options} />
       )}
     </div>
   );
