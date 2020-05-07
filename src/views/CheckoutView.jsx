@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import {updateUserInfo} from '../services/user';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { getShopItem } from '../services/shop';
+import { getShopItem, createShopEntry } from '../services/shop';
 import LoadingSpinner from '../components/LoadingSpinner';
 import pizzeto from '../img/pizzeto.png'
 import Button from 'react-bootstrap/Button';
@@ -72,10 +72,7 @@ function CheckoutView(props) {
         updateUserInfo(user.id, {balance: newBalance})
             .then(response => {
                 user.balance = newBalance;
-                setSuccess(true);
-                setInterval(() => {
-                    setTimeout(true);
-                }, 700)
+                updateShopEntry()
             })
             .catch(err => {
                 console.log("Error updating balance");
@@ -95,13 +92,24 @@ function CheckoutView(props) {
         updateUserInfo(user.id, {balance: newBalance})
             .then(response => {
                 user.balance = newBalance;
+                updateShopEntry()
+            })
+            .catch(err => {
+                console.log("Error updating balance");
+            }) 
+    }
+
+    const updateShopEntry = () => {
+        createShopEntry({userId: user.id, shopItem: item._id, quantity: amount})
+            .then(result => {
                 setSuccess(true);
                 setInterval(() => {
                     setTimeout(true);
                 }, 700)
+                console.log(result)
             })
             .catch(err => {
-                console.log("Error updating balance");
+                console.log("Error updating shop entry");
             }) 
     }
 

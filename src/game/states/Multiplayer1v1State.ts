@@ -67,7 +67,7 @@ class Multiplayer1v1State extends State {
     this.internalState = InternalState.NONE;
 
     // setup client socket
-    this.client = new Client(io('localhost:4000'));
+    this.client = new Client(io('https://pizzablock-server.herokuapp.com/'));
     this.initNetworkHandlers();
 
     // setup interface
@@ -258,10 +258,18 @@ class Multiplayer1v1State extends State {
     this.board.onPlaceBlock = this.sendPlaceBlock.bind(this);
   }
 
-  private sendEnterQueue(): void {
+  private async sendEnterQueue(): Promise<void> {
+    const res = await fetch('https://geoip-db.com/json/', {
+      method: 'GET',
+    });
+    
+    const json = await res.json();
+    console.log(json);
+    
     this.client.sendData(new EnterQueuePacket({
       userID: Game.user.id,
       name: Game.user.name,
+      ip: json.IPv4,
     }));
   }
 
@@ -340,6 +348,8 @@ class Multiplayer1v1State extends State {
       this.board.isOnlineGameWinner = false;
       this.otherBoard.isWinner = true;
     }
+
+    Game.history.push(`/results/${packet.data.gameID}`);
   }
 }
 

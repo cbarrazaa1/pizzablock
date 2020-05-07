@@ -9,15 +9,19 @@ export const Screen = {
   height: 800,
 };
 
+type PoorMansUnknown = {} | null | undefined;
+
 class Game {
   private g: CanvasRenderingContext2D;
   private currentState: State;
   public static user: GameUser;
+  public static history: any;
 
-  constructor(g: CanvasRenderingContext2D, state: GameState, user: GameUser) {
+  constructor(g: CanvasRenderingContext2D, state: GameState, user: GameUser, history: any) {
     this.g = g;
     this.currentState = SingleplayerState.getInstance();
     Game.user = user;
+    Game.history = history;
 
     if (state === GameState.MULTIPLAYER_1v1) {
       this.currentState = Multiplayer1v1State.getInstance();

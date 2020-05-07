@@ -22,6 +22,7 @@ function MainRouter() {
                 <PrivateRoute path="/shop" component={ShopView} />
                 <PrivateRoute path="/admin" component={AdminView} />
                 <PrivateRoute path="/checkout/:id" component={CheckoutView} />
+                <PrivateRoute path="/results" component={() => <div>hi</div>} />
                 <NonAuthRoute path="/login" component={LoginView} />
                 <NonAuthRoute path="/signup" component={SignupView} />
             </Switch>

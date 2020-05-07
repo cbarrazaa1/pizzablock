@@ -3,6 +3,7 @@ import {useState, useCallback, useRef, useEffect} from 'react';
 import Game, {Screen} from './Game';
 import {Nullable} from '../util/Types';
 import {GameState} from './states/State';
+import {useHistory} from 'react-router-dom';
 
 export type GameUser = {
   id: string;
@@ -17,12 +18,13 @@ type Props = {
 function GameContainer({state, user}: Props): JSX.Element {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [game, setGame] = useState<Nullable<Game>>(null);
+  const history = useHistory();
 
   const inputCallback = useCallback((e) => game?.input(e), [game]);
 
   useEffect(() => {
-    setGame(new Game(canvas.current!.getContext('2d')!, state, user));
-  }, [state, user]);
+    setGame(new Game(canvas.current!.getContext('2d')!, state, user, history));
+  }, [state, user, history]);
 
   useEffect(() => {
     if (game == null) {
