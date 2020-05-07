@@ -105,6 +105,7 @@ export class GameOverPacket extends Packet {
 
 type EndGamePacketData = {
   readonly winnerID: string;
+  readonly gameID: string;
 };
 
 export class EndGamePacket extends Packet {

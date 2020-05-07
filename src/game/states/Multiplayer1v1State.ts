@@ -348,6 +348,8 @@ class Multiplayer1v1State extends State {
       this.board.isOnlineGameWinner = false;
       this.otherBoard.isWinner = true;
     }
+
+    window.location.replace(`/results/${packet.data.gameID}`);
   }
 }
 
