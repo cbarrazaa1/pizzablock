@@ -57,6 +57,25 @@ export function usersLastMonth() {
     });
 }
 
+export function usersDataLastMonth() {
+  let url = `${SERVER_URL}/get/usersDataLastMonth/`;
+  let settings = {
+    method: 'GET',
+  };
+
+  return fetch(url, settings)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+
+      throw new Error(response.statusText);
+    })
+    .then((responseJSON) => {
+      return responseJSON;
+    });
+}
+
 export function shopEntriesRevenueLastMonth() {
   let url = `${SERVER_URL}/get/shopEntriesRevenueLastMonth/`;
   let settings = {

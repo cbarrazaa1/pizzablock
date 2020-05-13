@@ -7,6 +7,8 @@ import Card from 'react-bootstrap/Card';
 import Chart from './Chart';
 import {totalPizzetos, totalRevenue, totalVisitors} from './../services/admin';
 import LoadingSpinner from './LoadingSpinner';
+import Table from 'react-bootstrap/Table';
+import {usersDataLastMonth} from '../services/admin';
 
 function ChartDeck(props) {
   const [revenue, setRevenue] = useState(0);
@@ -102,6 +104,28 @@ function ChartDeck(props) {
                     </Card.Title>
                     <Card.Body>
                       <Chart id="3" />
+                      <Table striped bordered hover>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Games played</th>
+                                <th>Balance</th>
+                                <th>Date created at</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {usersDataLastMonth().map((u, i) => {
+                                return (
+                                    <tr>
+                                        <td>{u.user_name}</td>
+                                        <td>{u.games.length}</td>
+                                        <td>{u.balance} pizzetos</td>
+                                        <td>{u.createdAt}</td>
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                      </Table>
                     </Card.Body>
                   </Card.Body>
                 </Card>
