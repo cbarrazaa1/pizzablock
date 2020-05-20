@@ -63,7 +63,7 @@ export default function Auth({ children }) {
     }
 
     const logout = () => {
-        authLogout()
+        authLogout(user.id)
         setIsAuthenticated(false);
     }
 
