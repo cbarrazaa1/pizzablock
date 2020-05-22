@@ -18,6 +18,7 @@ import InputHandler, {InputEvent, InputKey} from '../InputHandler';
 import {EnterQueue1v4Packet, PlaceBlockPacket, PacketType, EnterGame1v4Packet, PlayerPlaceBlockPacket, GameOverPacket, EndGamePacket} from '../network/Packets';
 import io from 'socket.io-client';
 import { mapBlockTypeToColor } from '../logic/Block';
+import { updateUserInfo } from '../../services/user';
 
 enum InternalState {
   NONE,
@@ -293,6 +294,12 @@ class Multiplayer1v4State extends State {
     this.initBoard(data.initialLevel);
     this.cntMenu.setVisible(false);
     this.cntGame.setVisible(true);
+
+    // update pizzetos
+    const newBalance = parseInt(Game.user.balance) - 10;
+    updateUserInfo(Game.user.id, {balance: newBalance}).then(() => {
+      Game.user.balance = String(newBalance);
+    });
   }
 
   private handlePlayerPlaceBlock(packet: PlayerPlaceBlockPacket): void {

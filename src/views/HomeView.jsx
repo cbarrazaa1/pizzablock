@@ -71,19 +71,8 @@ function HomeView(props) {
             setLoading(false);
             return;
         }
-
-        updateUserInfo(user.id, {balance: newBalance})
-            .then(response => {
-                user.balance = newBalance;
-                history.push(`/play/${games[gameIdx].name}`);
-            })
-            .catch(err => {
-                console.log("Error updating balance");
-                setAlertVariant('danger');
-                setAlertMessage('Error updating current balance. Please try again');
-                setShowAlert(true);
-                setLoading(false);
-            }) 
+        
+        history.push(`/play/${games[gameIdx].name}`);
     }
 
     return (
