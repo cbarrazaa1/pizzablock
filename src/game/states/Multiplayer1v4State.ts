@@ -30,7 +30,7 @@ enum InternalState {
 type OtherPlayerInfo = {
   id: string;
   name: string;
-  board: OtherBoard;
+  boardIndex: number;
 }
 
 class Multiplayer1v4State extends State {
@@ -280,13 +280,13 @@ class Multiplayer1v4State extends State {
     }
     this.otherPlayersMap = {};
 
-    data.others.forEach(other => {
+    data.others.forEach((other, i) => {
       const playerInfo: OtherPlayerInfo = {
         id: other.id,
         name: other.name,
-        board: this.otherBoards[Object.keys(this.otherPlayersMap).length],
+        boardIndex: i,
       };
-      console.log(other.id, playerInfo);
+      this.otherBoards[i].name = other.name;
       this.otherPlayersMap[other.id] = playerInfo;
     });
 
@@ -303,13 +303,14 @@ class Multiplayer1v4State extends State {
   }
 
   private handlePlayerPlaceBlock(packet: PlayerPlaceBlockPacket): void {
-    const {block, clearedLines, lines, level, score, whoID} = packet.data;
-    
+    const {block, clearedLines, whoID} = packet.data;
+    const board = this.otherBoards[this.otherPlayersMap[whoID].boardIndex];
+
     // update board
     for (let i = 0; i < block.data.length; i++) {
       for (let j = 0; j < block.data[0].length; j++) {
         if (block.data[i][j] === 1) {
-          this.otherPlayersMap[whoID].board.mat[block.x + j][block.y + i] = {
+          board.mat[block.x + j][block.y + i] = {
             color: mapBlockTypeToColor(block.type),
             value: 1,
           }
@@ -319,12 +320,12 @@ class Multiplayer1v4State extends State {
 
     // clear lines
     if (clearedLines.length > 0) {
-      this.otherPlayersMap[whoID].board.shiftBlocks(clearedLines);
+      board.shiftBlocks(clearedLines);
     }
   }
 
   private handleGameOver(packet: GameOverPacket): void {
-    this.otherPlayersMap[packet.data.whoID].board.gameOver = true;
+    this.otherBoards[this.otherPlayersMap[packet.data.whoID].boardIndex].gameOver = true;
   }
 
   private handleEndGame(packet: EndGamePacket): void {

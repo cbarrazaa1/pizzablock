@@ -7,6 +7,7 @@ class OtherBoard {
   public gameOver: boolean;
   public onlineGameEnded: boolean;
   public isWinner: boolean;
+  public name: string;
   private parent: Widget;
   private blockSize: number;
 
@@ -16,6 +17,7 @@ class OtherBoard {
     this.gameOver = false;
     this.onlineGameEnded = false;
     this.isWinner = false;
+    this.name = '';
 
     this.mat = new Array(BOARD_WIDTH).fill(null).map(() =>
       new Array(BOARD_HEIGHT).fill({
@@ -56,10 +58,16 @@ class OtherBoard {
       }
     }
 
+    // render name
+    const width = BOARD_WIDTH * this.blockSize;
+    const height = BOARD_HEIGHT * this.blockSize;
+    g.font = '20px Arial';
+    g.fillStyle = '#ffffff';
+    let size = g.measureText(this.name);
+    g.fillText(this.name, BOARD_X + width / 2 - size.width / 2, BOARD_Y + 10);
+
     // render game over
     if (this.gameOver) {
-      const width = BOARD_WIDTH * this.blockSize;
-      const height = BOARD_HEIGHT * this.blockSize;
 
       g.fillStyle = 'rgba(0, 0, 0, 0.75)';
       g.fillRect(BOARD_X - 1, BOARD_Y - 1, width + 2, height + 2);
@@ -82,7 +90,7 @@ class OtherBoard {
         g.font = '20px Arial';
       }
       size = g.measureText(text);
-      g.fillText(text, BOARD_X + width / 2 - size.width / 2, height / 2);
+      g.fillText(text, BOARD_X + width / 2 - size.width / 2, BOARD_Y + height / 2);
     }
   }
 
