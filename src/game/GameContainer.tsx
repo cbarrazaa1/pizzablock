@@ -8,6 +8,7 @@ import {useHistory} from 'react-router-dom';
 export type GameUser = {
   id: string;
   name: string;
+  balance: string;
 };
 
 type Props = {

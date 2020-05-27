@@ -92,7 +92,10 @@ export function authLogin(credentials) {
         })
 }
 
-export function authLogout() {
+export async function authLogout(id) {
+    await fetch(`${SERVER_URL}/logout/${id}`, {
+        method: 'POST',
+    });
     localStorage.removeItem('token');
     return new Promise((resolve, reject) => (resolve(true)))
 }

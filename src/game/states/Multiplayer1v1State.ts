@@ -27,6 +27,7 @@ import Board, {
 import CustomWidget from '../ui/CustomWidget';
 import OtherBoard from '../logic/OtherBoard';
 import {mapBlockTypeToColor} from '../logic/Block';
+import { updateUserInfo } from '../../services/user';
 
 enum InternalState {
   NONE,
@@ -303,6 +304,12 @@ class Multiplayer1v1State extends State {
     this.otherLevel.setCounter(initialLevel);
     this.cntMenu.setVisible(false);
     this.cntGame.setVisible(true);
+
+    // update pizzetos
+    const newBalance = parseInt(Game.user.balance) - 10;
+    updateUserInfo(Game.user.id, {balance: newBalance}).then(() => {
+      Game.user.balance = String(newBalance);
+    });
   }
 
   private handlePlayerPlaceBlock(packet: PlayerPlaceBlockPacket): void {
