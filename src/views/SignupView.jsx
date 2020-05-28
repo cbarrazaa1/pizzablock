@@ -11,7 +11,8 @@ import colors from '../constants/colors';
 import globalStyles from '../constants/styles';
 import {authSignUp} from '../services/auth';
 import {uploadPofilePicture} from '../services/user';
-import LoadingSpinner from '../components/LoadingSpinner'
+import LoadingSpinner from '../components/LoadingSpinner';
+import { CountryDropdown, RegionDropdown, CountryRegionData } from 'react-country-region-selector';
 
 function SignupView() {
 
@@ -63,12 +64,12 @@ function SignupView() {
         setLastName(event.target.value);
     }
 
-    const onCountryChange = event => {
-        setCountry(event.target.value);
+    const onCountryChange = value => {
+        setCountry(value);
     }
 
-    const onStateChange = event => {
-        setState(event.target.value);
+    const onStateChange = value => {
+        setState(value);
     }
 
     const onStreetAddrChange = event => {
@@ -216,21 +217,20 @@ function SignupView() {
                         <h3 className='mt-3'>Location</h3>
                         <Form.Group>
                             <Form.Label>Select your country</Form.Label>
-                            <Form.Control as="select" onChange={onCountryChange}>
-                                <option value="Mexico">Mexico</option>
-                                <option value="United States">United States</option>
-                                <option value="China">China</option>
-                                <option value="Canada">Canada</option>
-                                <option value="Guatemala">Guatemala</option>
-                            </Form.Control>
+                            <CountryDropdown
+                                value={country}
+                                onChange={onCountryChange}
+                            />
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Select your state</Form.Label>
-                            <Form.Control as="select" onChange={onStateChange}>
-                                <option value="Nuevo Leon">Nuevo Leon</option>
-                                <option value="Jalisco">Jalisco</option>
-                                <option value="Other">Other</option>
-                            </Form.Control>
+                            <div>
+                                <RegionDropdown
+                                    country={country}
+                                    value={state}
+                                    onChange={onStateChange}
+                                />
+                            </div>
                         </Form.Group>
                         <Form.Group>
                             <Form.Control

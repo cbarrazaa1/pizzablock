@@ -29,6 +29,7 @@
     "react": "^16.13.0",
     "react-bootstrap": "^1.0.0",
     "react-chartjs-2": "^2.9.0",
+    "react-country-region-selector": "^2.1.0",
     "react-dom": "^16.13.0",
     "react-flip-move": "^3.0.4",
     "react-images-upload": "^1.2.8",
