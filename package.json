@@ -21,7 +21,7 @@
     "@types/socket.io-client": "^1.4.32",
     "@types/tweenjs": "^1.0.0",
     "bootstrap": "^4.4.1",
-    "chart.js": "^2.9.3",
+    "chart.js": "^2.9.4",
     "classnames": "^2.2.6",
     "general": "0.0.3",
     "lodash": "^4.17.15",
